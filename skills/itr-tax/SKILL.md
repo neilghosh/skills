@@ -1,6 +1,10 @@
 ---
 name: itr-tax
-description: Expert assistant for filing an Indian ITR-2 under the new tax regime via the online e-filing wizard, for a salaried taxpayer with capital gains and foreign assets/income. Use when preparing, computing, reconciling, or filing such a return — including multi-employer salary and terminal benefits, mutual-fund/equity/ESPP/RSU capital gains, foreign dividends + FTC/Form 67, Schedule OS/CG/112A/FSI/TR/FA/AL, AIS/TIS/26AS validation, portal CSV uploads, and pre-submission multi-model audit.
+description: "Prepare and file an Indian ITR-2 (new regime) online for a salaried taxpayer with capital gains and foreign assets/income (RSU/ESPP, dividends + FTC/Form 67, Schedules CG/112A/FSI/TR/FA/AL). Not for old regime, ITR-1/3/4, or the offline utility."
+license: MIT
+metadata:
+  version: 1.0.0
+  author: Neil Ghosh
 ---
 
 # ITR-2 Online Filing Assistant (India — New Regime, Foreign Assets)
@@ -19,6 +23,25 @@ Responsibilities:
 - Generate a filing-readiness report and a source-of-truth extraction set.
 
 Scope note: this skill is deliberately focused on the **online-wizard ITR-2 / new-regime / foreign-asset** path. It does not cover old-regime optimisation, business/P&L returns (ITR-3/4), or the offline utility, because those are out of scope for this workflow.
+
+## Example
+
+Given a taxpayer with two employers (one a job change with gratuity + leave encashment), US RSU/ESPP shares, foreign dividends with US withholding, and Indian mutual-fund/equity capital gains, the skill drives the full flow and produces reconciled schedule values (illustrative round numbers):
+
+```text
+Head              Value (₹)     Source / check
+Salary            1,20,00,000   Form 16 x2 + F&F; std ded 75,000; gratuity 10(10), leave 10(10AA)
+Other Sources        4,00,000   savings/FD/EPF(Rule 9D) + domestic + foreign dividends (credit method)
+Capital Gains (net)     60,000   112A LTCG 90,000 less STCL 30,000 (set off in CYLA); 112A taxable 0
+Deductions (80CCD2)     90,000   employer NPS (14% of Basic cap)
+Total income      1,23,00,000   (after Chapter VI-A)
+Tax + surcharge + cess ~38,00,000
+Less FTC (Form 67)      40,000   = min(foreign tax, DTAA-rate x income); same in FSI + TR
+Balance payable          ~0      after salary TDS + self-assessment challan
+
+Artifacts generated: Form 67 IncomeDetails.csv, Schedule 112A (B3) CSV, Schedule FA A3 CSV,
+and a pre-submission multi-model audit table (expected vs final JSON, PASS/FAIL).
+```
 
 ## Skill Boundary (generic vs personalized)
 
