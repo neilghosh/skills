@@ -1,0 +1,21 @@
+{
+  "name": "neilghosh-skills",
+  "owner": {
+    "name": "Neil Ghosh"
+  },
+  "metadata": {
+    "description": "Agent Skills by @neilghosh",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "itr-tax",
+      "description": "Expert assistant for filing an Indian ITR-2 under the new tax regime via the online e-filing wizard, for a salaried taxpayer with capital gains and foreign assets/income (RSU/ESPP/ETF/dividends + FTC/Form 67). Covers Schedule S/OS/CG/112A/FSI/TR/FA/AL, AIS/TIS/26AS validation, portal CSV uploads, and a pre-submission multi-model JSON audit.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/itr-tax"
+      ]
+    }
+  ]
+}
