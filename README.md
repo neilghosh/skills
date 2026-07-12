@@ -17,7 +17,39 @@ instructions) and any helper scripts.
 
 ## Install
 
-### Claude Code (plugin marketplace)
+This is a **standard [Agent Skill](https://agentskills.io)** (a `SKILL.md` folder), so it is **not Claude-specific** — it works with any agent that reads the Agent Skills / rules format. The easiest cross-tool path is the **[`asm`](https://github.com/luongnv89/asm) CLI**, which installs it into 19 different tools.
+
+### With `asm` (works for Codex, Copilot, Gemini, Antigravity, Cursor, Claude, …)
+```bash
+npm install -g agent-skill-manager            # one-time
+
+asm install github:neilghosh/skills -p codex        # OpenAI Codex
+asm install github:neilghosh/skills -p copilot      # GitHub Copilot
+asm install github:neilghosh/skills -p gemini       # Gemini CLI
+asm install github:neilghosh/skills -p antigravity  # Google Antigravity
+asm install github:neilghosh/skills -p cursor       # Cursor
+asm install github:neilghosh/skills -p claude       # Claude Code
+asm install github:neilghosh/skills -p all          # every detected tool
+```
+Add `-s global` (available everywhere) or `-s project` (current repo only), and `--yes` to skip prompts. After the ASM registry PR is merged you can also install **by name**: `asm install neilghosh/itr-tax -p <tool>`.
+
+**Where it lands & how each tool uses it** (`asm` handles the path automatically):
+
+| Tool | `-p` value | Installs to | Consumed as |
+|---|---|---|---|
+| Claude Code | `claude` | `~/.claude/skills/` | dynamically-loaded **skill** |
+| OpenAI Codex | `codex` | `~/.codex/skills/` | dynamically-loaded **skill** |
+| Gemini CLI | `gemini` | `~/.gemini/skills/` | dynamically-loaded **skill** |
+| Google Antigravity | `antigravity` | `~/.antigravity/skills/` | dynamically-loaded **skill** |
+| Amp / OpenCode / Pi / Aider / OpenClaw / generic | `amp` / `opencode` / `pi` / `aider` / `openclaw` / `agents` | `~/.<tool>/skills/` | dynamically-loaded **skill** |
+| GitHub Copilot | `copilot` | `~/.github/instructions/` | **custom instruction** (always applied) |
+| Cursor / Windsurf / Cline / Roo / Continue / Zed / Augment | `cursor` / `windsurf` / … | `~/.<tool>/rules/` | **rules file** (always applied) |
+
+> Skill-aware tools (the `skills/` group) load `SKILL.md` **on demand** when the task matches its description. Rules/instruction-based tools (Copilot, Cursor, Windsurf, …) apply it as an **always-on** instruction file — so for those, install it **per-project** (`-s project`) into the repo where you do your tax work, and remove it when done, so it isn't always in context. In all cases the `reference/*.md` files and `scripts/` are pulled in with the skill.
+
+Run `asm config show` to see all 19 providers and their paths.
+
+### Claude Code (plugin marketplace — alternative)
 ```
 /plugin marketplace add neilghosh/skills
 /plugin install itr-tax@neilghosh-skills
@@ -28,14 +60,15 @@ Then just mention the skill (e.g. "use the itr-tax skill to …").
 Upload the `skills/itr-tax` folder as a custom skill — see
 [Using skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude).
 
-### Any agent with a skills directory (manual)
+### Manual (any tool)
 ```
 git clone https://github.com/neilghosh/skills.git
-cp -r skills/skills/itr-tax /path/to/your/agent/skills/
+cp -r skills/skills/itr-tax /path/to/your/tool/skills/   # or /rules/ or /instructions/
 ```
 
 ### skills.sh
 This repo is indexed at [skills.sh/neilghosh/skills](https://skills.sh/neilghosh/skills).
+
 
 ## Helper scripts (itr-tax)
 
