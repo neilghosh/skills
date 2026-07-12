@@ -50,36 +50,21 @@ and a pre-submission multi-model audit table (expected vs final JSON, PASS/FAIL)
 
 ## Currency of Law — Verify Current-Year Rules Online (MANDATORY GATE)
 
-**Do not trust the model's training-knowledge cutoff or any number hardcoded in this skill or plan.** Indian tax law, rates, thresholds, limits, forms, schema, and portal behaviour change every year (often in the Finance Act / budget), and the portal's CSV templates and validations change silently. Every hardcoded figure in this skill is **illustrative (tagged to a specific AY)** and must be re-verified for the target assessment year before use.
+**Do not trust the model's knowledge cutoff or any number hardcoded in this skill or plan.** Indian tax law, rates, thresholds, forms, schema, and the portal's CSV templates/validations change every year (Finance Act / budget). Every figure here is **illustrative and AY-tagged** — re-verify for the target AY before use.
 
-At the **start of every filing**, and whenever a rule/rate materially affects the computation, **look it up from an authoritative live source** rather than recalling it:
-
-- **Authoritative sources (in order):** the Income Tax Department portal `incometax.gov.in` (help pages, ITR/utility instructions, schema, the schedule-specific CSV instruction PDFs such as the 112A/115AD spec), the relevant **Finance Act / Budget** for the AY, CBDT circulars/notifications, and the official DTAA text for treaty rates. Corroborate any secondary/blog source against one of these.
-- **Verify at minimum for the target AY:** slab rates and the applicable regime default; **standard deduction**; **surcharge slabs and caps**; the **§112A LTCG exemption threshold and rate**; **§50AA** scope; **80CCD(2)** cap %; **EPF Rule 9D** taxable-contribution limit; **rebate 87A** limit; **Rule 128 / Form 67** deadline; **DTAA article + treaty rate** for the relevant country; **Schedule FA** reporting period and penalty; and the **due dates / 234A-B-C** mechanics.
-- **Re-fetch portal artifacts fresh each year:** the ITR schema/utility version, the **downloaded CSV templates** (112A, FA A2/A3, Form 67 `IncomeDetails`) and their **official instruction PDFs**, and the exact dropdown/enumeration strings — never assume last year's format still holds. When a CSV format or a dropdown value is uncertain, **search the official instructions and/or test one or two rows** before bulk entry (this is how the FA date format `YYYY-MM-DD`, the 112A `BE/AE` codes, and the DTAA credit-cap were pinned down).
-- **When a live lookup and a hardcoded/recalled value disagree, the verified live official source wins** — update the plan and flag the change to the taxpayer.
-- Prefer using the environment's web-fetch/web-search tools for these lookups; cite the source and date in the plan so the basis is auditable.
+At the **start of every filing** (and whenever a rule/rate affects the computation), look it up from an authoritative live source rather than recalling it:
+- **Sources (in order):** `incometax.gov.in` (help pages, ITR/utility instructions, schema, the schedule CSV instruction PDFs e.g. 112A/115AD), the **Finance Act/Budget** for the AY, CBDT circulars/notifications, and the official **DTAA** text. Corroborate any blog/secondary source against these.
+- **Verify at minimum for the AY:** slab rates + regime default, standard deduction, surcharge slabs/caps, §112A threshold+rate, §50AA scope, 80CCD(2) cap %, EPF Rule 9D limit, 87A rebate, Rule 128/Form 67 deadline, DTAA article+rate, Schedule FA period/penalty, and 234A/B/C.
+- **Re-fetch portal artifacts fresh each year:** schema/utility version, the CSV templates (112A, FA, Form 67) + their instruction PDFs, and exact dropdown strings. When a format is uncertain, **read the official instructions and/or test one or two rows** before bulk entry (that is how the FA `YYYY-MM-DD` date, 112A `BE/AE` codes, and DTAA credit-cap were pinned down).
+- **A verified live official source overrides any recalled/hardcoded value** — update the plan, cite source + date, and flag the change to the taxpayer. Prefer the environment's web-fetch/search tools.
 
 ## Non-Negotiable Source Scope Gate
 
-Before extracting or using any value:
-
-1. Establish the taxpayer's exact legal name, PAN, target financial year, assessment year, and residential status (this workflow assumes **Resident & Ordinarily Resident**, required for Schedule FA/FSI).
-2. Reject any record whose name/PAN belongs to another person, even a family member in a shared folder or combined statement.
-3. Apply the financial-year date filter **at transaction level**. A filename, folder, form, or report total is not enough.
-4. Treat statutory windows separately: **Schedule FA uses the calendar year (1-Jan–31-Dec)**; calendar-year records feed FA only, unless the transaction date also falls in the Indian FY.
-5. Retain older acquisition data only when linked to an in-scope disposal, holding-period test, opening balance, or cost basis — never as current-year income.
-6. Never use a post-year holdings snapshot as a financial-year or calendar-year closing balance.
-7. Record every excluded source and reason in a scope manifest.
+Before using any value: (1) fix the taxpayer's legal name, PAN, FY, AY, and residential status (this workflow assumes **Resident & Ordinarily Resident**, required for FA/FSI); (2) reject any record whose name/PAN is someone else's (even a family member in a shared folder); (3) apply the FY filter **at transaction level** — a filename/folder/total is not enough; (4) **Schedule FA uses the calendar year (1-Jan–31-Dec)** — calendar records feed FA only unless the transaction date is also in the FY; (5) keep older acquisition data only when linked to an in-scope disposal/holding-period/cost basis, never as current income; (6) never use a post-year snapshot as a closing balance; (7) log every excluded source in a scope manifest.
 
 ## Prior-Year Return — Methodology Template Only
 
-The prior-year filed ITR JSON, Form 67, and workbooks are invaluable **structural references** but must **not** supply current-year amounts:
-
-- Reuse: workbook structure/formulas, source→schedule mapping, lot-matching and holding-period method, FX-rate evidence format, and **Schedule FA/CG/OS/FSI/TR/AL field structure** (e.g. whether FA was filed A3-only, entity names, addresses, acquisition dates).
-- Rebuild every current-year transaction row from current-year broker/employer evidence.
-- Never carry forward prior-year quantities, proceeds, cost, dividends, tax, rates, balances, account peaks, or schedule totals unless independently verified as an opening lot/balance.
-- Label prior-year files `REFERENCE_ONLY` so retrieval never mixes their numbers into current totals; revalidate the method against the target AY's law and ITR schema.
+Use the prior-year filed ITR JSON, Form 67, and workbooks as **structural references only** (formulas, source→schedule mapping, lot/holding-period method, FX-evidence format, and the FA/CG/OS/FSI/TR/AL field structure — e.g. whether FA was filed A3-only, and entity names/addresses/dates). **Never** carry forward prior-year amounts (quantities, cost, dividends, tax, balances, peaks, totals) unless independently verified as an opening lot/balance. Rebuild every current-year row from current-year evidence; label prior-year files `REFERENCE_ONLY` and revalidate the method against the target AY.
 
 ## Workflow overview
 
@@ -89,125 +74,42 @@ The prior-year filed ITR JSON, Form 67, and workbooks are invaluable **structura
 
 # Income Head 1 — Salary
 
-Collect per employer: Form 16 (Part A + Part B), Form 12BA (perquisites), monthly payslips/tax sheets, and — for a previous employer — the **full-and-final settlement**.
-
-## Multiple Employers & Terminal Benefits
-
-- On a job change, reconcile each employer independently. A current employer's Form 16 often shows **previous-employer salary and section-10 exemptions as zero**, even if a separate payroll calculation considered them — use the previous employer's own final tax sheet / AIS figure.
-- Apply the **₹75,000 standard deduction once** on consolidated salary (new regime).
-- **Gratuity u/s 10(10):** exempt up to the statutory limit (₹20 lakh cap); a fully-exempt gratuity has taxable balance 0.
-- **Leave encashment u/s 10(10AA):** exemption = cash-equivalent using the prescribed `leave-days ÷ 30 × average-monthly-basic` method, capped at the statutory limit. Employer payout under a more generous payroll formula is **not** fully exempt — the excess stays taxable inside salary. Keep **paid / exempt / taxable** portions separate.
-
-## ESPP / RSU / ESPP perquisites
-
-Always separate these four things; never infer one from another:
-- **Payroll contribution** — employee purchase funding, **not** a deduction.
-- **Perquisite value (17(2))** — taxable salary AND part of the capital-gain cost basis (sec 49(2AA)).
-- **TCS** — a separately reported credit (Form 26AS Part VI / Form 27D); never inferred from contribution or perquisite. LRS TCS applies only above the annual threshold and only if actually collected.
-- **Refund** — a reverse cash movement, not fresh income/remittance without evidence.
-- **RSU vs ESPP:** a new joiner's RSUs usually have a 1-year cliff and may not vest in the first partial year (no RSU perquisite yet); ESPP purchases still occur. Confirm from the broker year-end statement what actually vested/purchased, and label perquisites accurately (do not call an ESPP perquisite "RSU").
-
-## Consolidated salary
-
-Sum all employers' gross → subtract verified section-10 exemptions → subtract ₹75,000 standard deduction → income chargeable under Salary.
-
----
+Collect per employer: Form 16 (Part A+B), Form 12BA, payslips/tax sheets, and — for a previous employer — the **full-and-final settlement**.
+- **Multiple employers:** reconcile each independently; a current employer's Form 16 often shows previous-employer salary/exemptions as 0 — use the previous employer's own final figure. Apply the **₹75,000 standard deduction once** on consolidated salary.
+- **Gratuity 10(10)** exempt up to the statutory cap; **leave encashment 10(10AA)** exempt only up to the prescribed `leave-days ÷ 30 × avg-monthly-basic` amount — the excess stays taxable. Keep paid/exempt/taxable separate. (Portal itemisation quirk: `reference/wizard-validation-gotchas.md`.)
+- **ESPP/RSU:** separate payroll contribution (not a deduction), perquisite (17(2), taxable + cost basis u/s 49(2AA)), TCS (separate credit, never inferred), and refunds. New-joiner RSUs may not have vested yet — confirm from the broker statement and label perquisites accurately (don't call ESPP "RSU").
+- Consolidated salary = Σ gross − verified §10 exemptions − ₹75,000.
 
 # Income Head 2 — Other Sources (OS)
 
-Collect: bank/FD interest certificates, savings interest, EPF interest (Rule 9D), SGB/bond coupons, domestic dividend statements, and the **foreign dividend ledger** (see Foreign Income).
-
-## Components
-- **Savings + FD/deposit interest** — taxed at slab; banks deduct only 10% TDS.
-- **EPF taxable interest (Rule 9D):** EPF interest is exempt only on employee contributions up to **₹2.5 lakh/year** (₹5 lakh where the employer does not contribute). Interest on the **excess** is taxable each year; EPFO deducts 10% TDS u/s 194A and reports it in 26AS — treat that reported slice as hard truth and include it. Do **not** include the exempt portion. (Forward lever for *future* years only: reduce VPF; mandatory 12%-of-basic EPF is statutory.)
-- **Domestic dividends** — usually no TDS (each payer below threshold); fully taxable at slab.
-- **Foreign dividends** — see below; go in OS at normal rate (credit method).
-
-## Schedule OS entry — foreign dividend credit method
-- Put foreign dividends in **Schedule OS 1a(i) "Dividend, Gross"** at the **normal rate** — do **not** tick the DTAA/TRC special-rate flag (that would tax at the treaty rate and move it to special-rate income, a different mechanism). Claim the foreign tax as FTC via Schedule FSI/TR instead.
-- **Table 10 (quarterly accrual) validation:** the portal requires row 3a (dividend) quarterly split to equal `1a(i) − DTAA − 57(1)`. Split each dividend by **receipt date** into the FY quarters (≤15/6, 16/6–15/9, 16/9–15/12, 16/12–15/3, 16/3–31/3) and combine with domestic dividends. If left mismatched, OS won't validate.
-
----
+Collect bank/FD/savings interest certificates, EPF interest, SGB/bond coupons, domestic dividends, and the foreign dividend ledger.
+- Interest (savings/FD/deposit) is slab-taxed with only 10% TDS. **EPF taxable interest (Rule 9D):** only the excess-contribution slice EPFO reports in 26AS is taxable — include that, not the exempt portion (`reference/reconciliation-and-hard-truth.md`).
+- **Domestic dividends:** usually no TDS; fully slab-taxed.
+- **Foreign dividends:** enter in Schedule OS 1a(i) at normal rate (credit method, no DTAA flag); the Table 10 row-3a quarterly split must reconcile — see `reference/foreign-income-and-fa.md`.
 
 # Income Head 3 — Capital Gains
 
-Collect: MF capital-gains statement (CAMS/KFintech/Kuvera) with lot detail; broker tax-P&L (e.g. Zerodha) with buy/sell dates, quantities, cost, proceeds; foreign broker gain/loss statement (Rule 115 FX). Rebuild every lot from current-year evidence.
+Rebuild every lot from current-year evidence (MF statement, broker tax-P&L, foreign broker gain/loss with Rule 115 FX). Key rules:
+- **112A (Section B):** equity-MF LTCG + domestic listed-equity LTCG/LTCL (12.5% above ₹1.25 lakh; verify for the AY) — nets gains and losses; has a CSV upload.
+- **A5 (Section A):** slab-rate STCG for §50AA fund units (Silver/Gold/international) and foreign shares/ETFs — enter under "assets other than unquoted shares (ii)", not unquoted (i).
+- **Set-off (Sec 70/71):** STCL sets off vs STCG and LTCG; LTCL only vs LTCG; current-year set-off **before** carry-forward; apply the §112A ₹1.25L threshold **after** set-off; special-rate gains are in total income even when tax is nil.
+- Set-off flows via **CYLA → BFLA → CFL** (verify net CG, 112A taxable, carry-forward). **Table F** 112A quarterly must equal Schedule BFLA even at 0 tax.
 
-## Classification
-- **Equity MF (STT-paid) LTCG + domestic listed-equity LTCG/LTCL** → **Section 112A** (12.5% above ₹1.25 lakh — *verify the rate and exemption threshold for the target AY*). This includes losses (the schedule nets them).
-- **§50AA specified-fund units** (Silver/Gold ETFs, FOFs, international funds) → **STCG at slab rate** regardless of holding period (from AY 2024-25).
-- **Foreign shares/ETFs** → STCG/LTCG at applicable/slab rate (not 111A/112A; no STT).
+Full classification, set-off order, A5/112A placement, and Table F detail: **`reference/capital-gains.md`**.
 
-## Order of Set-Off (Sec 70/71) — critical
-1. **STCL** sets off against **both STCG and LTCG** (any category).
-2. **LTCL** sets off only against **LTCG**.
-3. **Current-year set-off happens before carry-forward** — never carry a loss forward while an eligible current-year gain can absorb it.
-4. **Apply the §112A ₹1.25 lakh threshold AFTER loss set-off** — do not preserve a loss merely because the remaining gain would fall below the threshold.
-5. Special-rate gains are **included in total income even when the tax on them is nil** (e.g. net 112A LTCG under ₹1.25 lakh → taxable 0 but the income still flows to BFLA/Table F).
+# Foreign Income, FTC & Foreign Assets
 
-## Schedule CG placement in the online wizard
-- **Section B / row B (112A):** equity MF LTCG + domestic listed-equity LTCG/LTCL. Has a **Download/Upload CSV** (see 112A CSV below).
-- **Section A / row A5 "assets other than A1–A4":** slab-rate STCG — §50AA fund units and foreign shares/ETFs. Within A5, put consideration under sub-row **"ii. assets other than unquoted shares"**, NOT **"i. unquoted shares"** (that wrongly invokes §50CA FMV rules). Enter the net.
-- After both sections, set-off flows through **CYLA → BFLA → CFL** automatically. Verify net CG, that 112A taxable = 0 when under threshold, and **carry-forward = 0** when the loss was absorbed.
+Compute foreign income/FTC on the **Indian Apr–Mar FY**; Schedule FA uses the **calendar year** — keep separate.
+- **Credit method:** foreign dividends go in **Schedule OS 1a(i)** at normal rate (no DTAA special-rate flag); claim the foreign tax as **FTC** via FSI/TR. FTC = lower of (foreign tax, Indian tax on that income), and the portal **caps it at DTAA-rate × income** — set relief = round(DTAA-rate × income) and use the **same** figure in Form 67, FSI (col e), and TR.
+- **Form 67 first:** file and **e-verify** a fresh Form 67 for the AY *before* the ITR; the evidence ZIP must be **PDF-only**.
+- **FSI:** foreign income head = **Other Sources**; column (d) is **manual** (else relief 0).
+- **Schedule FA (mandatory for any foreign asset; ₹10L penalty):** follow the prior year's structure — often **A3-only** (entity-based; prefill carries lots forward); sold holdings → closing 0 + proceeds; if A3-only, foreign broker **cash goes in Schedule AL Bank**.
 
-## Schedule CG Table F (quarterly accrual) — common validation error
-Table F row for "LTCG taxable @12.5% u/s 112A" **must sum to the corresponding Schedule BFLA value, even when the tax is 0** (error: "Table F Sl no.5 breakup of all quarters should equal item 3vii of Schedule BFLA"). Distribute the net 112A gain by the quarter of the underlying transfers (bulk March MF redemptions → the `16/3-31/3` column). Since tax is 0, the quarter choice has no 234C effect.
-
----
-
-# Foreign Income & FTC (Form 67, Schedule FSI/TR)
-
-## Foreign dividend/withholding ledger (build first)
-Per platform, one row per receipt: payment date, security, gross USD, foreign-tax USD, **rate date = last day of the month preceding receipt**, SBI TT buy rate, gross INR, foreign-tax INR. Sum unrounded INR per platform, then round the grand total. Inspect account activity for **withholding reversals/corrections** — use the final net tax, not every negative entry summed. Compute all foreign income/FTC on the **Indian Apr–Mar FY** (even though US 1042-S uses Jan–Dec).
-
-## DTAA (India–US) essentials
-- US dividend treaty rate = **25%** (Article 10); credit under **Section 90** (not 91). *(Confirm the treaty article and rate for the specific country/income type from the official DTAA text — rates differ by country and by income class.)*
-- **Credit method:** keep the dividend at normal Indian rate in Schedule OS; claim foreign tax as FTC via FSI/TR.
-- FTC = **lower of** (foreign tax paid, Indian tax on that income).
-
-## DTAA rate-cap (Form 67 + FSI both)
-The portal caps the Sec 90/90A credit at **DTAA-rate × income** (25% × income). Because actual withholding rounds independently, real foreign tax can be a few rupees **above** that product and the form rejects it. Resolution: set **relief = round(DTAA-rate × income)** and use that **same** figure in Form 67, Schedule FSI (relief), and Schedule TR — all three must match exactly. Record the tiny reduction as a note.
-
-## Form 67 (file and e-verify BEFORE the ITR)
-- File a **fresh Form 67 for each AY**; a prior-year acknowledgement is never reusable.
-- Form 67 must be **e-verified**, not merely submitted, for the FTC to be valid.
-- **`IncomeDetails.csv` bulk upload:** download the portal template and reuse its **exact header** (it has trailing spaces and two `Please specify` columns — preserve byte-for-byte). Write **UTF-8 without BOM**, CRLF. Dropdown columns (`United States Of America`, `Dividend`) must match portal strings exactly or they import blank. Fill optional numeric columns with **0** (115JB/JC, section 91). The **"Amount" under Sec 90/90A is a required field** — fill it with the relief; don't rely on the auto-computed total.
-- **Evidence attachment:** the portal accepts a ZIP but **every inner file must be a PDF** (CSV/MD/XLSX rejected); keep it under ~5 MB. Include broker dividend reports, year-end statements, and Form 1042-S. Keep working CSVs outside the zip.
-
-## Schedule FSI / TR entry
-- **FSI head-of-income must match where the income sits:** foreign dividend (credit method) → **Other Sources**, not Salary.
-- FSI column **(d) "Tax payable under normal provisions in India" is manual** — if left 0, relief (e) = min(c, d) = 0. Compute (d) = income × marginal rate (slab + surcharge + cess). Set **(c) = the DTAA-capped foreign tax** so relief (e) lands on the capped figure. Clear any stray DTAA-article value on zero-income head rows.
-- Schedule TR must show the **same relief**, **Section 90**, and answer the "foreign tax refunded?" question (usually **No**).
-
----
-
-# Foreign Assets — Schedule FA
-
-**Mandatory if ANY foreign asset is held** (shares, brokerage, bank, signing authority), regardless of income. Non-disclosure carries a ₹10 lakh Black Money Act penalty. Reporting period is the **calendar year (1-Jan–31-Dec)**, isolated from FY income.
-
-## Structure — follow the prior year for consistency
-Foreign brokerage/stock-plan holdings (RSU/ESPP shares, ETFs) can be reported as **A2 custodial accounts + A3 equity interest**, OR **A3-only**. **If the prior-year return used A3-only, replicate it** — A3 is entity-based (no account number needed), and the current-year prefill carries those A3 lots forward (entity/date/initial value preserved; period values zeroed for you to refill).
-- Tables: **A1** foreign depository/bank; **A2** custodial/brokerage (incl. uninvested cash); **A3** foreign equity/debt interest (RSU/ESPP shares, ETFs). Report institution/entity, acquisition date, peak value, closing value, gross income, and sale proceeds as the schema requires.
-- A **holding sold during the year** → its own A3 row with **closing = 0** and the sale value in "gross proceeds."
-- **If filing A3-only, foreign broker cash is NOT in FA** — disclose it under **Schedule AL "Bank (including all deposits)"**.
-- Convert USD→INR at the relevant SBI TT rate (e.g. 31-Dec for closing). FA is **disclosure-only (no tax impact)** — conservative peak estimates and a consolidated ETF row (when per-ETF split is unavailable) are acceptable; never substitute a later holdings screenshot for the prescribed closing date.
-
-## Recovering per-lot values from the prior-year return
-Prior-year per-lot closing values are exact multiples of a single per-share base (`base = closing ÷ shares`); recover each lot's **share count = prior_closing ÷ base**, verify they sum to the known total, then compute current-year peak/closing/dividend per lot = `shares × current_per_share_value`. This reproduces the lot-by-lot pattern without per-lot broker data.
-
----
+Full ledger method, DTAA cap, Form 67, FSI/TR entry, FA tables and per-lot recovery: **`reference/foreign-income-and-fa.md`** (CSV formats in `reference/portal-csv-and-scripts.md`).
 
 # Deductions — New Regime
 
-Under the new regime, **only these salary-linked deductions survive**:
-- **80CCD(2)** — employer NPS contribution (capped at 14% of Basic + DA for the relevant employer). Claim the eligible amount.
-- **Standard deduction ₹75,000** (applied under Salary).
-
-*(The ₹75,000 standard deduction, the 14% 80CCD(2) cap, and the list of new-regime-allowed deductions are AY-specific — verify against the current Finance Act before filing.)*
-
-Everything else is **disallowed** in the new regime and must NOT be claimed: 80C, 80CCD(1B), 80D, 80E, 80G (most), 80TTA/80TTB, HRA, home-loan interest on self-occupied property, LTA, Chapter VI-A investment deductions. If the taxpayer asks about last-minute tax saving, the honest answer is that only 80CCD(2) (already via employer) and the standard deduction apply; the new regime is usually still better for a high earner with few deductions — quantify both regimes to confirm.
-
----
+Only **80CCD(2)** (employer NPS, capped 14% of Basic+DA) and the **₹75,000 standard deduction** survive under the new regime (verify limits for the AY). Everything else is **disallowed** (80C, 80CCD(1B), 80D, 80E, 80G, 80TTA/TTB, HRA, home-loan interest, LTA). For last-minute saving only 80CCD(2) applies; the new regime is usually still better for a high earner — quantify both to confirm.
 
 # Schedule AL (Assets & Liabilities)
 
@@ -216,30 +118,15 @@ Applicable when total income > ₹50 lakh. Report at **cost** (not market value)
 Categories: **(A) Immovable property** (per-property description/address/cost; answer the **"Do you own any immovable asset?" Yes/No dropdown** or validation fails); **(B) Movable** — jewellery/bullion, art, vehicles/yachts, and **financial assets** (bank incl. foreign broker cash, shares & securities, insurance, loans given, cash in hand); **(C) Liabilities**.
 
 ## Asset-addition source-of-funds control
-- Schedule AL growth is a **disclosure/reconciliation** issue — **never** add it to taxable income.
-- FD/RD principal, share/MF cost, property cost, and loan repayment are balance-sheet movements, not income; only the related event (interest, dividend, rent, gain, salary) is income. Market appreciation is not a new cost. Transfers between accounts/assets are not fresh wealth — don't double-count.
-- **Year-over-year test:** compare each AL component with prior year at cost; remove revaluation, transfers, reinvested proceeds, loan-funded and gift/inheritance acquisitions, and prior-disclosed opening balances. The remainder is **unexplained net addition**.
-  - `ratio = unexplained net additions ÷ total income × 100`
-  - **>50%:** prominent source-of-funds warning + reconciliation table. **>100%:** critical; don't finalize AL until documented.
-- Never increase income to force AL to balance; surface unexplained additions and request evidence. Reasonable cost estimates are allowed only when exact cost is unavailable — label them, source-back them, apply consistently, and do not omit small foreign accounts (use conservative disclosed estimates).
+Schedule AL growth is a **disclosure** issue — never add it to income. FD/share/MF/property cost and loan repayment are balance-sheet moves; only the related event (interest/dividend/gain/salary) is income; market appreciation and inter-account transfers are not new wealth. Year-over-year, strip revaluation/transfers/reinvestment/loan-funded/gifts; if **unexplained net additions > 50% of total income**, raise a source-of-funds warning + reconciliation table (>100% is critical). Never inflate income to force AL to balance; use labelled, source-backed cost estimates only when exact cost is unavailable, and never omit small foreign accounts.
 
 ---
 
 # Validation — AIS / TIS / Form 26AS Hard-Truth Floor
 
-Treat current-year **26AS, AIS, TIS as a mandatory minimum filing floor**.
+Treat current-year **26AS, AIS, TIS as a mandatory minimum filing floor**: every active/accepted item must map to the ITR or carry a documented exclusion; every TDS/TCS credit must match 26AS **exactly** (a ₹1-2 excess is immaterial — CPC caps at 26AS); use exact reported values; the return may report **more** (foreign income is expected to be absent — never a reason to omit). Build a hard-truth matrix and don't finalize until every row is `Exact`, `Included above reported`, or `Explained difference`. **Prefill** omits foreign income, FTC, broker gains and FA/AL — reconcile prefill->final, don't force equality. If a **CAS** is available, run an end-of-filing completeness check mapping every holding/sale/dividend to a schedule (market value is a completeness check, not AL cost).
 
-1. Every **active/processed/accepted/source-confirmed** income or TDS/TCS item must be mapped to the ITR or have a documented exclusion/reconciliation reason.
-2. Every TDS/TCS credit claimed must match the 26AS/prefill credit **exactly** (subject only to documented rounding/corrections). A prefill TDS a rupee **above** 26AS is immaterial — CPC caps credit at 26AS; correct it to the 26AS-exact value if the row edits easily, else proceed.
-3. Use exact reported values — never silently round, net, omit, or estimate them.
-4. SFT sale/purchase amounts are **not** automatically taxable income — match to broker/RTA totals, compute gains separately.
-5. The return **may report more** than AIS/TIS/26AS when independent evidence exists (foreign income is **expected** to be absent — its absence is not a gap). Absence never permits omission.
-6. Build a **hard-truth matrix**: statement, info code/section, source, status, reported amount, reported TDS/TCS, ITR destination, filed amount, difference, reconciliation reason. Don't finalize until every row is `Exact`, `Included above reported`, or `Explained difference`.
-
-**Prefill** is an information import, not a return — it commonly omits foreign income, FTC, broker capital gains, no-TDS income, and FA/AL data. Always produce a **prefill→final reconciliation** rather than forcing the return to equal prefill.
-
-## CAS end-of-filing completeness check
-If an NSDL/CDSL CAS is available, use it as a final completeness control: build a row per account/ISIN/folio and confirm every holding maps to Schedule AL (at cost) or has an exclusion reason; every FY sale/redemption/maturity maps to the CG/OS ledger; every dividend/interest maps to OS or is marked non-taxable. Prevent double-counting across demat/folio/broker/AIS. CAS market value is a completeness check, **not** AL cost. CAS is not a full wealth statement — separately check foreign accounts, bank/FD, physical assets, NPS/insurance, and unlisted assets.
+Full hard-truth matrix fields, CAS matrix, EPF Rule 9D detail, the balance-tax diagnostic bridge, and non-statement-item deferral: **`reference/reconciliation-and-hard-truth.md`**.
 
 ---
 
@@ -256,20 +143,14 @@ Apply the **15% surcharge cap** on dividend income and 111A/112A income where re
 
 **Multiple-employer surcharge gap:** each employer withholds on its own salary and may apply a *lower* surcharge slab; consolidated income can cross ₹1cr and require a **higher** slab — recompute surcharge on **total consolidated income**, creating a self-assessment gap to pay before filing.
 
-## Why balance tax arises (diagnostic bridge)
-Decompose the balance by income that was **under-withheld**, comparing each stream's marginal-rate tax (top slab + surcharge + cess) against the credit given:
-- **Interest (FD/EPF/bond):** TDS only 10% vs ~35–39% marginal — usually the biggest driver.
-- **Dividends:** domestic often no TDS; foreign only treaty withholding vs higher Indian marginal (difference payable after FTC).
-- **Capital gains:** no TDS; special-rate tax may net near zero after set-off/threshold.
-Present as an income-by-income shortfall bridge so the balance reads as structural, not an error.
+## Why balance tax arises
+A salaried high earner often has a balance because interest (10% TDS vs ~35-39% marginal), no-TDS domestic dividends, and treaty-only-withheld foreign dividends are under-withheld; present an income-by-income shortfall bridge (see `reference/reconciliation-and-hard-truth.md`).
 
 ## Interest 234A/B/C
 Include using the **actual payment date**; recompute whenever income/credits change. Treat every payment estimate as provisional until the portal validates the final figure.
 
-## Non-statement item deferral (user decision)
-Domestic items absent from 26AS/AIS/TIS (e.g. a provisional SGB coupon, small NBFC interest not in AIS) are the only genuinely "soft" additions the taxpayer may choose to **defer** to a later revision. When deferring: keep a documented `deferredItems` block (amount + reason + re-add impact), recompute downstream totals, never silently delete, and keep reported income **at or above** every hard-truth floor. Foreign income is never "soft" — always self-report it.
-
----
+## Non-statement item deferral
+Only domestic items absent from 26AS/AIS/TIS (e.g. a provisional SGB coupon) may be **deferred** to a later revision — document them, recompute totals, and keep reported income at/above every hard-truth floor. Foreign income is never deferrable. Detail: `reference/reconciliation-and-hard-truth.md`.
 
 # Online Wizard — Screen-by-Screen Flow
 
@@ -282,53 +163,15 @@ Flow: **Lets Get Started → Filing Status questionnaire → Select Schedules �
 
 ## Cross-schedule linkages & validation gotchas (high-frequency)
 
-- **80CCD(2) "Amount eligible for deduction" = 0** unless Schedule S has a **designated "Basic Salary" component** in the salary-nature breakup (the cap is 14% of Basic+DA). If salary was a lump, the base is 0. Fix: add the Basic Salary component, re-confirm Schedule S; the eligible amount may show 0 on the input screen until a full recompute — verify in Part B-TI.
-- **Gratuity 10(10) AND leave encashment 10(10AA) both have a strict cross-check** — each exemption is capped at the amount **itemised as a salary sub-head** in Schedule S 17(1), and (for gratuity) requires the employer **Nature of employment ∈ {PSU, PSU-Pensioners, Others-Pensioners, Others}**. A single "Basic Salary" lump → the portal sees the receipt as 0 and rejects the exemption ("Kindly restrict the exemption u/s 10(10)/10(10AA) to the ... dropdown of salary as per section 17(1)"). Fix: split out a **"Gratuity" sub-head** (= the exemption) and a **"Leave Encashment" sub-head** (= the **full amount received**; the taxable remainder stays in salary), reduce the Basic component so the 17(1) total is unchanged, and set Nature of employment = Others for a private employer. Do **not** mis-code gratuity as **10(10A) (commuted pension)** to dodge this — wrong statutory head. Expect **two successive validation passes** (gratuity then leave encashment; the portal reports one at a time).
-- **Rule of thumb:** itemise a 17(1) sub-head only where a matching exemption is claimed against it. A fully-taxable employer salary (no gratuity/leave/HRA exemption) can stay a prefilled lump — only the terminal-benefit/previous-employer block usually needs itemisation.
-- **Perquisite "Nature of income" description must be accurate** (e.g. don't label an ESPP+meal+other perquisite "RSU"). Zero-tax but a disclosure defect.
-- **Schedule S save validations:** "Nature of employer" is mandatory (Others for private); a perquisite set to "Other benefits/Any Other" requires a **Description**; empty "Profit in lieu of salary" rows must be filled or deleted.
-- **Schedule OS foreign dividend:** enter at normal rate in 1a(i); Table 10 row 3a quarterly split must equal `1a(i) − DTAA − 57(1)`.
-- **Schedule FSI:** foreign income head = Other Sources; column (d) is manual (else relief 0); (c) = DTAA-capped tax so relief = Form 67 figure.
-- **Schedule CG Table F:** LTCG-112A quarterly split must equal Schedule BFLA even when tax is 0.
-- **Schedule AL:** answer "Do you own any immovable asset?" **Yes** + property details; include foreign broker cash in Bank when FA is A3-only.
-- **Schedule SI** is read-only/auto — it correctly shows 112A income with ₹0 tax when under threshold; nothing to hand-fill.
-- **Never hand-patch the prefill JSON** for upload — schema/enumerations/calculated fields/digest change by AY. Enter through the wizard; keep the original prefill immutable.
+Many portal validations fail because a value in one schedule silently depends on another. The high-frequency ones: **80CCD(2)** needs a designated "Basic Salary" 17(1) component (14%-of-Basic cap); **gratuity 10(10) / leave encashment 10(10AA)** must be itemised as 17(1) sub-heads with employer nature = Others (never mis-code as 10(10A)); **FSI** foreign income sits under Other Sources with a **manual** column (d); **CG Table F** 112A quarterly must equal Schedule BFLA even at 0 tax; **AL** needs the immovable-asset Yes/No dropdown answered; **SI** is read-only; never hand-patch the prefill JSON. Fixes can cascade into new validations — re-validate after each change. Full list with exact error messages and fixes: **`reference/wizard-validation-gotchas.md`**.
 
 ## Portal CSV uploads
 
-### Schedule 112A (B3) CSV
-Official spec: `https://static.incometax.gov.in/iec/foservices/assets/itr-shared/documents/112A_115AD_CSV_Instructions.pdf` (re-read yearly). Fields are **coded**, not free text.
-- **⚠️ NEVER open the CSV in Excel** — it inserts thousands-separator commas into large numbers (`1243590` → `12,43,590`), turns numbers into `1.24E+06`, and drops the trailing column, causing **all rows to skip** (`common.errors.csv_row_skip`). Generate programmatically, upload directly, view only in **Notepad**.
-- Reuse the template's **exact header** (single line, no trailing newline, trailing comma = empty 15th col). **Data rows = 14 fields, NO trailing comma.** UTF-8 no BOM, CRLF.
-- **Flag col 1a is a 2-letter code:** `BE` (on/before 31-Jan-2018, grandfathered) / `AE` (after). Long text makes every row skip.
-- **AE rows consolidate into ONE row:** ISIN=`INNOTREQUIRD`, Name=`CONSOLIDATED`, **Units & Sale-price blank**; total sale value in col 6, total cost in col 8 (=col 7 = col 13), col 14 = 6−13.
-- **BE rows are scrip-wise** with FMV-on-31-Jan-2018 (col 10); if the true NAV is unavailable, conservatively set FMV/unit = cost/unit (safe when net 112A < ₹1.25 lakh).
-- No special characters (`, / - _ ( ) & @ \ ' " ; :`) in any value; monetary cols rounded to whole rupees. Reconcile col-14 total to source MF+equity LTCG net. Manual "Add" entry is an equivalent fallback (real dropdown, no format friction).
-
-### Schedule FA A3/A2 CSV
-- Reuse the template's exact header (12 named + trailing-empty 13th). **Data rows = 12 fields, NO trailing comma.** UTF-8 no BOM, CRLF.
-- Col 1 = `United States Of America` (text); col 2 = ITR **numeric code `2`** (not ISO "US"). Col 6 nature = `Company`/`ETF`.
-- **Col 7 date MUST be `YYYY-MM-DD`** (e.g. `2020-06-15`); `DD-MM-YYYY` and `DD-Mon-YYYY` are rejected ("Please Enter Valid input" on col 7) — the #1 FA-CSV error.
-- Avoid commas inside address/name (unquoted fields break on them).
-- **Upload APPENDS, it does not replace** — delete existing/prefilled rows first (or use replace if offered), then verify the final row count.
-
-### General CSV discipline
-Reuse the portal's downloaded template header verbatim; write UTF-8-no-BOM + CRLF; never open in Excel before upload; test one or two rows first when the format is uncertain; view only in Notepad.
-
-### Helper scripts (`scripts/` in this skill directory)
-Deterministic, generic generators/auditors encode these formats so filing is fast and predictable (see `scripts/README.md`). They take input JSON + the freshly downloaded portal template (no taxpayer data inside):
-- `build_112a_csv.py` — Schedule 112A (B3) CSV (BE/AE, 14-field, AE-consolidated).
-- `build_fa_a3_csv.py` — Schedule FA A3 CSV (YYYY-MM-DD dates, code `2`, per-lot recovery from prior-year JSON).
-- `build_form67_csv.py` — Form 67 `IncomeDetails.csv` (exact header, DTAA relief cap).
-- `audit_itr_json.py` — final ITR JSON vs an independently-computed expected set (PASS/FAIL), plus `--find`/`--dump-keys` inspection.
-
-Per the Currency-of-Law gate: re-download templates and re-read the official instruction PDFs each year, and update a script if a format has changed.
-
----
+The portal's bulk-upload CSVs (Schedule 112A, Schedule FA, Form 67) have strict formats that cause silent all-rows-skip failures. Core discipline: reuse the **freshly downloaded template header verbatim**; **UTF-8 no BOM + CRLF**; **never open in Excel** before upload (comma corruption); test a row or two when unsure. 112A uses `BE/AE` codes + 14-field rows (AE-consolidated); FA needs `YYYY-MM-DD` dates + country code `2` and **appends** (delete prefill first); Form 67 needs the exact header + DTAA-capped relief. Exact per-file formats and the deterministic generators: **`reference/portal-csv-and-scripts.md`** and **`scripts/README.md`**.
 
 # Pre-Submission Multi-Model JSON Audit (before e-verification)
 
-After full entry but **before submission/e-verification**, download the final JSON and audit it independently. Prefer launching **multiple isolated review agents on different models in parallel** (e.g. GPT, Gemini, Opus), each recomputing **from the source-of-truth files** (plan + extractions), NOT from the JSON — then consolidate (diverse models catch different error classes).
+After full entry but **before submission**, download the final JSON and audit it independently — ideally via **multiple isolated review agents on different models in parallel** (e.g. GPT, Gemini, Opus), each recomputing from the source-of-truth files (plan + extractions), NOT from the JSON, then consolidate (diverse models catch different error classes).
 
 Parse the JSON (root usually `d["ITR"]["ITR2"]`) and verify rupee-exact:
 1. **Income heads** — salary, OS (foreign dividend at correct rate/head), each CG bucket.
@@ -341,7 +184,7 @@ Parse the JSON (root usually `d["ITR"]["ITR2"]`) and verify rupee-exact:
 8. **Schedule AL** — total and components; **no double-counting** of any cost.
 9. **Classification correctness (zero-tax but still fix)** — statutory codes (gratuity `10(10)` not `10(10A)`; leave `10(10AA)`), perquisite descriptions, employer nature-of-employment. **Even ₹0-tax misclassifications are corrected before filing** — they are disclosure defects that can invite a CPC query.
 
-Produce a figure-by-figure PASS/FAIL table (expected vs JSON vs independent recompute) and a verdict. The mechanical comparison can be run with `scripts/audit_itr_json.py` (feed it an independently-computed expected set); still run genuine independent/multi-model recomputation of the numbers that feed the expected file. Apply fixes in-portal, re-download, re-audit changed fields. **Fixes can cascade into new validations** (e.g. correcting gratuity to 10(10) forces salary sub-head itemisation, which then also demands the leave-encashment sub-head) — re-validate after each change.
+Produce a PASS/FAIL table (expected vs JSON vs recompute) and a verdict; `scripts/audit_itr_json.py` runs the mechanical comparison against an independently-computed expected set. Apply fixes in-portal, re-download, re-audit — **fixes can cascade** (correcting gratuity to 10(10) forces the salary sub-head split, which then demands the leave-encashment sub-head), so re-validate after each change.
 
 ---
 
@@ -357,21 +200,7 @@ Produce a figure-by-figure PASS/FAIL table (expected vs JSON vs independent reco
 
 # Cross-Cutting — Document Discovery, Passwords, Persistence
 
-## Document discovery (Gmail / Drive / broker portals)
-- Navigation changes over time; document identity/contents do not. Search by official sender/subject and the correct FY/CY date range; retain message IDs. Notification emails are **secondary** evidence for date/amount — broker/account statements are the controlling source. Separate monthly bank-interest emails from dividend emails.
-- Objectives: historical CAS (month ending 31-March), broker holdings-at-cost as-on 31-March, FD/bank balance confirmations, foreign calendar-year statements (opening/peak/closing/income/proceeds/cost), filed Form 67 (not just acknowledgement), prior ITR JSON, dividend/foreign-tax proof (with reversals).
-- Validate after download: correct taxpayer/PAN, correct FY/CY/closing date, whether values are cost vs market vs income vs tax, acknowledgement vs detailed form, and whether a calendar-year total must be split to the FY.
-
-## Encrypted PDF passwords (common patterns)
-Try systematically before asking: AIS/TIS = PAN+DOB lowercase (`abcde1234f15081990`); Form 16 = uppercase PAN; NPS = 12-digit PRAN; bank certificates = DOB `DDMMYYYY`. Use `pypdf.decrypt()`; save decrypted text to avoid re-decryption; never copy credentials into the skill or extractions.
-
-## Source-of-truth persistence (extractions / RAG)
-Save all extracted data as structured markdown by category (salary, OS, capital-gains-MF, capital-gains-stocks, foreign, TDS/FTC, AL, reconciliations) so re-extraction is never needed. Keep a scope manifest of included/excluded sources. Persist PDFs/images/spreadsheets as **detailed, linked, section-wise RAG files** (per stocks/MF/FD/salary) with fine-grained breakdowns. Continuously update the session log with cross-matches, decisions, superseded values, and document-discovery methods; generalize reusable lessons back into this skill and keep taxpayer-specific numbers in the plan.
-
-## Consolidated missing-data questionnaire
-Pre-analyze everything first, then ask **all** remaining questions in one batch (grouped by schedule/website so the taxpayer downloads several documents in one login). For each: schedule/component, prior-year reference (labelled reference-only), current evidence, the exact missing value, a recommended evidence-based answer, other options (incl. defer where permitted), blocking status, download path, destination field, and source-of-funds impact. Don't ask for values already derivable from reliable documents. After answers, apply all updates in one coherent batch and run a single delta review.
-
----
+**Document discovery** (Gmail/Drive/broker portals — search by sender/subject + FY/CY date range; statements are the controlling source), **encrypted-PDF password patterns** (PAN+DOB etc.; never store credentials), **source-of-truth persistence** (structured per-category extractions + linked RAG files; keep numbers in the plan, lessons in the skill), and the **consolidated missing-data questionnaire** (pre-analyze everything, then ask all remaining questions in one batch; apply answers as one coherent batch). Details: **`reference/discovery-and-persistence.md`**.
 
 # Filing Output
 
