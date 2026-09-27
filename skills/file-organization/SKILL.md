@@ -138,10 +138,43 @@ Store records that naturally encompass multiple individuals in shared domain roo
 
 ---
 
-## 5. Execution Workflow
+---
+
+## 5. Encrypted PDF Handling & Password Removal
+
+Personal archives frequently contain password-protected PDFs (e-Aadhaar, bank statements, salary slips, Form 16, insurance policies). Encrypted PDFs cannot be inspected via `pdftotext` or indexed.
+
+### A. Security Requirements
+1. **Never hardcode, store, or log passwords**: Passwords must never appear in transcripts, commit messages, or plaintext log files.
+2. **Hidden input**: Always acquire passwords interactively via terminal masked prompts (`getpass`) so characters are not echoed to stdout.
+3. **Session reuse**: Within a single execution session, cache verified passwords in memory to unlock other files using the same credentials (e.g. repeated DOB or PAN) without repeated prompts.
+
+### B. Bundled Utility: `scripts/unlock_pdf.py`
+
+The skill provides a turnkey decryption utility:
+
+```bash
+# 1. Prerequisite (fastest engine):
+# macOS: brew install qpdf
+# Linux: sudo apt install qpdf
+# Fallback: pip install pypdf
+
+# 2. Scan for locked PDFs without prompting (dry run):
+python3 scripts/unlock_pdf.py /path/to/archive --dry-run
+
+# 3. Securely unlock in-place (prompts via getpass; caches session password):
+python3 scripts/unlock_pdf.py /path/to/archive --in-place
+```
+
+---
+
+## 6. Execution Workflow
 
 ```text
 [Scan & Index Directory Tree]
+        │
+        ▼
+[Detect Encrypted PDFs ──▶ Run unlock_pdf.py (Secure getpass Prompt)]
         │
         ▼
 [Inspect Content via pdftotext / Page Render]
