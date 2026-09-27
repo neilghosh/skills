@@ -13,6 +13,7 @@ instructions) and any helper scripts.
 
 | Skill | What it does |
 |---|---|
+| [**file-organization**](./skills/file-organization) | Audits, deduplicates, reorganizes, and standardizes directories and files across personal, family, financial, and medical archives. Enforces strict content-based renaming, medical document conventions, space-free naming, and eliminates redundant words. |
 | [**itr-tax**](./skills/itr-tax) | Expert assistant for filing an **Indian ITR-2 (new regime)** via the online e-filing wizard for a **salaried taxpayer with capital gains and foreign assets/income** (RSU/ESPP/ETF/dividends + FTC/Form 67). Encodes the salary/terminal-benefit, capital-gains set-off, foreign-income/FTC, and Schedule OS/CG/112A/FSI/TR/FA/AL workflow; the portal's cross-schedule validation quirks; deterministic **CSV generators** (112A, FA A3, Form 67) and a **final-JSON auditor**; and a pre-submission multi-model audit. Includes a "Currency of Law" gate that requires verifying current-year rates/rules/formats from official sources (rules change yearly). |
 
 ## Install
