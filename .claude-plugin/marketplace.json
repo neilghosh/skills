@@ -16,6 +16,33 @@
       "skills": [
         "./skills/itr-tax"
       ]
+    },
+    {
+      "name": "parallel-reel-creator",
+      "description": "Creates Instagram-ready 9:16 vertical Reels (1080x1920) combining a YouTube reference video and a local video recording (e.g. GoPro, phone camera). Supports sequential comparison mode (reference plays while recreation is still, then recreation plays while reference is still), simultaneous side-by-side or stacked playback, custom timestamp slicing, and flexible audio routing.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/parallel-reel-creator"
+      ]
+    },
+    {
+      "name": "expedition-documentary-creator",
+      "description": "Creates broadcast-grade 4K expedition documentaries (NatGeo / BBC / Vox style) for public YouTube upload from GoPro and mobile/Google Photos videos using commercial-safe multilingual neural voices (UK/US English, Hindi, Bangla, and Odia IndicF5-MLX). Enforces zero-human-face shot selection, STFT voice-suppressed surrounding audio (retaining car, water, wind, and nature), clean large-font 4K Chapter Geographic Cards, and strict YouTube Multi-Language Audio (MLA) alignment.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/expedition-documentary-creator"
+      ]
+    },
+    {
+      "name": "youtube-custom-voice-player",
+      "description": "Overdubs an existing video already uploaded to YouTube into personal and sports commentary voices (neil, nasser, atherton, shastri, tony, holding, attenborough, bear_hindi) without uploading personal/celebrity voices to YouTube. Suppresses the YouTube video's voice while retaining surrounding ambient sound and generates a hostable Custom HTML5 + YouTube IFrame API Sync Player.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/youtube-custom-voice-player"
+      ]
     }
   ]
 }
