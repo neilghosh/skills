@@ -1,0 +1,23 @@
+{
+  "thinking": {
+    "provider": "gemini-agy",
+    "model": "Gemini 4 Argon (Medium)",
+    "settings_path": "~/.gemini/antigravity-cli/settings.json",
+    "role": "Architecture, planning, reasoning, task decomposition, and verification"
+  },
+  "workhorse": {
+    "provider": "ollama",
+    "model": "gemma4:26b",
+    "base_url": "http://localhost:11434/v1",
+    "lightweight": true,
+    "allow_all_policies": true,
+    "capabilities": {
+      "file_reads": true,
+      "file_writes": true,
+      "command_execution": true,
+      "subagents": false,
+      "mcp": false
+    },
+    "system_instructions": "You are a fast, precise local coding workhorse (gemma4:26b). Execute the exact coding, file editing, or command task assigned by the orchestrator concisely and accurately."
+  }
+}

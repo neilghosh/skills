@@ -43,6 +43,15 @@
       "skills": [
         "./skills/youtube-custom-voice-player"
       ]
+    },
+    {
+      "name": "local-workhorse",
+      "description": "Configures and operates the Hybrid Model Architecture combining a frontier thinking model in Antigravity CLI with a local Ollama gemma4:26b workhorse agent via the Antigravity Python SDK.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/local-workhorse"
+      ]
     }
   ]
 }
