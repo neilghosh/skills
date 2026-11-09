@@ -1,15 +1,9 @@
-#!/Users/neilghosh/devtools/voice/.venv/bin/python
+#!/usr/bin/env python3
 """
-Batch & Single Voice Cloning Bridge for /Users/neilghosh/devtools/voice
------------------------------------------------------------------------
-Uses the F5-TTS MLX environment and pre-cleaned reference voices in /Users/neilghosh/devtools/voice:
-  - neil      -> /Users/neilghosh/devtools/voice/neil_clean.wav
-  - tony      -> /Users/neilghosh/devtools/voice/tony_greig_clean.wav (aliases: toney greg, tony greig, tonygreig)
-  - tony_alt  -> /Users/neilghosh/devtools/voice/tony_greig_clean_alt.wav
-  - atherton  -> /Users/neilghosh/devtools/voice/atherton_clean.wav (aliases: arthoron, arthoton, mike atherton, bumble)
-
+Batch & Single Voice Cloning Bridge for F5-TTS MLX / IndicF5-MLX
+----------------------------------------------------------------
 Loads F5TTS.from_pretrained ONCE for an entire documentary script batch and masters each output
-to 48kHz using upscale_to_studio_48k() from /Users/neilghosh/devtools/voice/main.py.
+to 48kHz using upscale_to_studio_48k() from voices/main.py.
 """
 
 import argparse
@@ -18,7 +12,7 @@ import sys
 from pathlib import Path
 
 _BUNDLED_VOICE_DIR = Path(__file__).resolve().parent.parent / "voices"
-VOICE_DIR = _BUNDLED_VOICE_DIR if _BUNDLED_VOICE_DIR.exists() else Path("/Users/neilghosh/devtools/voice")
+VOICE_DIR = _BUNDLED_VOICE_DIR if _BUNDLED_VOICE_DIR.exists() else (Path.home() / "devtools" / "voice")
 sys.path.insert(0, str(VOICE_DIR))
 
 import math
@@ -67,7 +61,7 @@ def _load_ref_audio_24k(ref_audio_path: str) -> mx.array:
 
 def synthesize_batch(
     items: list[dict[str, str]],
-    voice_name: str = "neil",
+    voice_name: str = "odia",
     ref_audio_override: str | None = None,
     ref_text_override: str | None = None,
     steps: int = 16,
@@ -93,9 +87,9 @@ def synthesize_batch(
     ref_cache: dict[str, tuple[mx.array, str]] = {}
 
     for idx, item in enumerate(pending):
-        item_voice = item.get("voice") or default_preset_key or "neil"
-        preset_key = resolve_voice_preset(item_voice) or "neil"
-        preset = VOICE_PRESETS.get(preset_key, VOICE_PRESETS["neil"])
+        item_voice = item.get("voice") or default_preset_key or "odia"
+        preset_key = resolve_voice_preset(item_voice) or "odia"
+        preset = VOICE_PRESETS.get(preset_key) or next(iter(VOICE_PRESETS.values()))
         model_name = preset.get("model_name", "lucasnewman/f5-tts-mlx")
         if model_name not in model_cache:
             model_cache.clear()
@@ -141,9 +135,9 @@ def synthesize_batch(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Batch F5-TTS MLX Synthesizer using /Users/neilghosh/devtools/voice")
+    parser = argparse.ArgumentParser(description="Batch F5-TTS MLX Synthesizer")
     parser.add_argument("--batch-json", required=True, type=Path, help="JSON file with [{'text': '...', 'output': '...'}]")
-    parser.add_argument("--voice", default="neil", help="Preset name (neil, atherton/arthoron, tony/toney greg, tony_alt, bumble)")
+    parser.add_argument("--voice", default="odia", help="Preset name (e.g. odia, hindi, bangla, uk_english, us_english)")
     parser.add_argument("--ref-audio", default=None, help="Optional custom 24kHz mono WAV reference")
     parser.add_argument("--ref-text", default=None, help="Optional transcript for custom reference")
     parser.add_argument("--steps", type=int, default=16, help="ODE steps (16=fast batch mode, 32=max quality)")

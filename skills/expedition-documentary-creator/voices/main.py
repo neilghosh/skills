@@ -8,7 +8,7 @@ from f5_tts_mlx.generate import generate
 from isolate_voice import STUDIO_SR, studio_vocal_eq_and_exciter
 
 BASE_DIR = Path(__file__).resolve().parent
-_DEVTOOLS_INDIC = Path("/Users/neilghosh/devtools/voice/indic_f5_mlx")
+_DEVTOOLS_INDIC = Path.home() / "devtools" / "voice" / "indic_f5_mlx"
 INDIC_MODEL_DIR = (
     str(BASE_DIR / "indic_f5_mlx")
     if (BASE_DIR / "indic_f5_mlx" / "model_v1.safetensors").exists()

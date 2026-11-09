@@ -4,11 +4,11 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 
-sys.path.insert(0, '/Users/neilghosh/dev/video')
+sys.path.insert(0, '.')
 import map_telemetry_hud as mth
 
-OUT_PATH = '/Users/neilghosh/dev/video/youtube_thumbnail.jpg'
-MOBILE_TEST_PATH = '/Users/neilghosh/dev/video/work/thumb_mobile_150px.jpg'
+OUT_PATH = './youtube_thumbnail.jpg'
+MOBILE_TEST_PATH = './work/thumb_mobile_150px.jpg'
 W, H = 1920, 1080
 
 print("[1/5] Creating Johnny Harris / Vox tactile archival satellite map...")
@@ -45,18 +45,18 @@ for r, ty in enumerate(range(y_min, y_max + 1)):
 
 # Real GPS Waypoints
 REAL_ROUTE_GPS = [
-    {"name": "HYDERABAD", "lat": 17.3850, "lon": 78.4867},
+    {"name": "STARTING CITY", "lat": 17.3850, "lon": 78.4867},
     {"name": "Kurnool", "lat": 15.8281, "lon": 78.0373},
     {"name": "Anantapur", "lat": 14.6819, "lon": 77.6006},
-    {"name": "Bengaluru", "lat": 12.9716, "lon": 77.5946},
-    {"name": "Ramanagara", "lat": 12.7209, "lon": 77.2799},
+    {"name": "Metro Hub", "lat": 12.9716, "lon": 77.5946},
+    {"name": "Granite Hills", "lat": 12.7209, "lon": 77.2799},
     {"name": "Mandya", "lat": 12.5230, "lon": 76.8970},
-    {"name": "Mysuru", "lat": 12.2958, "lon": 76.6394},
+    {"name": "Valley City", "lat": 12.2958, "lon": 76.6394},
     {"name": "Gundlupet", "lat": 11.8080, "lon": 76.6890},
-    {"name": "Bandipur", "lat": 11.6664, "lon": 76.6331},
-    {"name": "Mudumalai", "lat": 11.5723, "lon": 76.6475},
+    {"name": "Forest Reserve", "lat": 11.6664, "lon": 76.6331},
+    {"name": "Biosphere", "lat": 11.5723, "lon": 76.6475},
     {"name": "Gudalur", "lat": 11.5074, "lon": 76.4950},
-    {"name": "KERALA", "lat": 11.6302, "lon": 76.2259},
+    {"name": "HIGHLANDS", "lat": 11.6302, "lon": 76.2259},
 ]
 
 global_origin_x = x_min * 256.0
@@ -98,7 +98,7 @@ for c in range(3):
 sat_base = Image.fromarray(map_arr.astype(np.uint8))
 
 print("[2/5] Creating seamless photographic fusion (The Single Hero Focal Point)...")
-hero_photo = Image.open('/Users/neilghosh/dev/video/work/thumb_banasura.jpg').convert('RGB').resize((W, H), Image.Resampling.LANCZOS)
+hero_photo = Image.open('./work/thumb_reservoir.jpg').convert('RGB').resize((W, H), Image.Resampling.LANCZOS)
 hero_photo = ImageEnhance.Contrast(hero_photo).enhance(1.4)
 hero_photo = ImageEnhance.Color(hero_photo).enhance(1.45)
 
@@ -160,7 +160,7 @@ font_sub = ImageFont.truetype('/System/Library/Fonts/Supplemental/Arial Bold.ttf
 hyd_pt = geo_to_canvas(17.3850, 78.4867)
 ker_pt = geo_to_canvas(11.6302, 76.2259)
 
-# 1. HYDERABAD PIN
+# 1. STARTING CITY PIN
 draw.ellipse([hyd_pt[0]-16, hyd_pt[1]-16, hyd_pt[0]+16, hyd_pt[1]+16], outline=(255, 210, 50, 200), width=4)
 draw.ellipse([hyd_pt[0]-8,  hyd_pt[1]-8,  hyd_pt[0]+8,  hyd_pt[1]+8],  fill=(255, 235, 90, 255), outline=(10, 15, 22, 255), width=2)
 # White tactile card
@@ -168,16 +168,16 @@ tag_w, tag_h = 210, 48
 tx0, ty0 = hyd_pt[0] + 20, hyd_pt[1] - 24
 draw.rounded_rectangle([tx0+4, ty0+4, tx0+tag_w+4, ty0+tag_h+4], radius=8, fill=(0, 0, 0, 160)) # shadow
 draw.rounded_rectangle([tx0, ty0, tx0+tag_w, ty0+tag_h], radius=8, fill=(255, 255, 255, 245), outline=(20, 30, 45, 255), width=2)
-draw.text((tx0 + 16, ty0 + 8), "HYDERABAD", font=font_pin, fill=(15, 22, 32))
+draw.text((tx0 + 16, ty0 + 8), "STARTING CITY", font=font_pin, fill=(15, 22, 32))
 
-# 2. KERALA DESTINATION PIN
+# 2. HIGHLANDS DESTINATION PIN
 draw.ellipse([ker_pt[0]-18, ker_pt[1]-18, ker_pt[0]+18, ker_pt[1]+18], outline=(255, 220, 60, 230), width=4)
 draw.ellipse([ker_pt[0]-9,  ker_pt[1]-9,  ker_pt[0]+9,  ker_pt[1]+9],  fill=(255, 65, 30, 255), outline=(255, 255, 255, 255), width=2)
 # Destination orange/red card
 ktx0, kty0 = ker_pt[0] - 190, ker_pt[1] - 24
 draw.rounded_rectangle([ktx0+4, kty0+4, ktx0+165+4, kty0+tag_h+4], radius=8, fill=(0, 0, 0, 160)) # shadow
 draw.rounded_rectangle([ktx0, kty0, ktx0+165, kty0+tag_h], radius=8, fill=(245, 55, 25, 245), outline=(255, 255, 255, 255), width=2)
-draw.text((ktx0 + 18, kty0 + 8), "KERALA", font=font_pin, fill=(255, 255, 255))
+draw.text((ktx0 + 18, kty0 + 8), "HIGHLANDS", font=font_pin, fill=(255, 255, 255))
 
 print("[4/5] Applying Vox 3-word rule: Massive, high-contrast typography...")
 title_x, title_y = 75, 80

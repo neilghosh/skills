@@ -2,12 +2,12 @@
 """
 Expedition Documentary Creator CLI (Low-Token Batch & Multi-Voice Engine)
 -------------------------------------------------------------------------
-Integrates directly with /Users/neilghosh/devtools/voice (`voice-clone` / F5-TTS MLX)
+Integrates directly with voices (`voice-clone` / F5-TTS MLX)
 when instructed with preset names:
-  - neil                     -> /Users/neilghosh/devtools/voice/neil_clean.wav
-  - atherton / arthoron      -> /Users/neilghosh/devtools/voice/atherton_clean.wav (Mike Atherton / Bumble)
-  - tony / toney greg        -> /Users/neilghosh/devtools/voice/tony_greig_clean.wav (Tony Greig)
-  - tony_alt                 -> /Users/neilghosh/devtools/voice/tony_greig_clean_alt.wav
+  - primary                     -> voices/primary_clean.wav
+  - narrator_uk / narrator_uk_alt      -> voices/narrator_uk_clean.wav (Mike NarratorUK / Bumble)
+  - tony / narrator classic        -> voices/narrator_classic_clean.wav (Classic Narrator)
+  - tony_alt                 -> voices/narrator_classic_clean_alt.wav
 Also supports Edge-TTS neural voices (en-US-AndrewMultilingualNeural, en-GB-RyanNeural).
 
 Caches all cleaned GoPro ambient audio, Esri 3-layer Hybrid Satellite tiles, HUD cards,
@@ -29,7 +29,7 @@ from voice_suppressor import extract_stereo_audio, suppress_voice_keep_ambient
 import map_telemetry_hud as mth
 import build_sample_doc as bsd
 
-DEVTOOLS_VOICE_PYTHON = '/Users/neilghosh/devtools/voice/.venv/bin/python'
+DEVTOOLS_VOICE_PYTHON = 'python3'
 F5_BATCH_SCRIPT = os.path.join(SCRIPT_DIR, 'f5_batch_synth.py')
 
 F5_VOICE_ALIASES = {
@@ -59,7 +59,7 @@ def load_wav_48k_stereo(wav_path, sr=48000):
 
 def synthesize_f5_devtools_texts(texts, work_dir, voice_preset, steps=16, q_bits=8, ref_audio=None, ref_text=None, sr=48000):
     """
-    Uses /Users/neilghosh/devtools/voice/.venv/bin/python + f5_batch_synth.py to load F5-TTS MLX
+    Uses python3 + f5_batch_synth.py to load F5-TTS MLX
     once and synthesize all uncached lines, with content-hash caching on disk.
     """
     cache_dir = os.path.join(work_dir, 'tts_cache')
@@ -209,10 +209,10 @@ def remux_existing_video_with_narration(tag, narr_audios, chap_audios, out_mp4, 
 
 
 VOICE_TRACK_METADATA = {
-    'neil': ('Neil Ghosh (Original Voice)', 'eng'),
-    'tony': ('Tony Greig Commentary', 'zaf'),
-    'tony_alt': ('Tony Greig Commentary (Alt)', 'zaf'),
-    'atherton': ('Mike Atherton Commentary', 'gbr'),
+    'primary': ('Primary Narrator', 'eng'),
+    'tony': ('Classic Narrator Commentary', 'zaf'),
+    'tony_alt': ('Classic Narrator Commentary (Alt)', 'zaf'),
+    'narrator_uk': ('British Narrator', 'gbr'),
     'bumble': ('David Lloyd (Bumble) Commentary', 'gbr'),
     'en-US-AndrewMultilingualNeural': ('Discovery US Narrator (Andrew)', 'usa'),
     'en-GB-RyanNeural': ('BBC Earth UK Narrator (Ryan)', 'eng'),
@@ -368,10 +368,10 @@ def render_with_narration_arrays(tag, narr_audios, chap_audios, out_mp4, work_di
 
 def main():
     parser = argparse.ArgumentParser(description='Expedition Documentary Creator')
-    parser.add_argument('--video-dir', default='/Users/neilghosh/Pictures/Kerala 2026/GoPro',
+    parser.add_argument('--video-dir', default='./raw_videos',
                         help='Folder containing raw GoPro/travel video clips')
-    parser.add_argument('--voice', default='neil',
-                        help='Voice preset in /Users/neilghosh/devtools/voice (neil, atherton/arthoron, tony/toney greg, tony_alt, bumble) OR Edge-TTS voice (en-US-AndrewMultilingualNeural, en-GB-RyanNeural)')
+    parser.add_argument('--voice', default='primary',
+                        help='Voice preset in voices (primary, narrator_uk/narrator_uk_alt, tony/narrator classic, tony_alt, bumble) OR Edge-TTS voice (en-US-AndrewMultilingualNeural, en-GB-RyanNeural)')
     parser.add_argument('--ref-audio', default=None, help='Optional custom 24kHz mono WAV path for F5-TTS')
     parser.add_argument('--ref-text', default=None, help='Optional transcript for custom ref-audio')
     parser.add_argument('--steps', type=int, default=16, help='F5-TTS ODE steps (16=fast batch, 32=max quality)')
@@ -382,7 +382,7 @@ def main():
                         help='Base segment tag in work/segments_v4/ to copy video streams from when --audio-only is used')
     parser.add_argument('--multi-audio-output', default=None,
                         help='Optional output MP4 path that bundles 1 video stream + ALL requested voices as selectable audio tracks')
-    parser.add_argument('--output', default='/Users/neilghosh/dev/video/sample_documentary_neil.mp4',
+    parser.add_argument('--output', default='./expedition_documentary.mp4',
                         help='Output MP4 path (or comma-separated paths matching --voice)')
     args = parser.parse_args()
 
@@ -464,7 +464,7 @@ def main():
         cmd = [
             DEVTOOLS_VOICE_PYTHON, F5_BATCH_SCRIPT,
             '--batch-json', batch_json_path,
-            '--voice', pending_f5_pairs[0][0] or 'neil',
+            '--voice', pending_f5_pairs[0][0] or 'primary',
             '--steps', str(args.steps),
             '-q', str(args.quantization_bits),
         ]

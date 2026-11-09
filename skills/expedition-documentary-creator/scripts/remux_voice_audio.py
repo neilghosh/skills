@@ -2,7 +2,7 @@
 """
 Fast Audio-Only Documentary Remuxer (Zero Video Re-encoding)
 ------------------------------------------------------------
-Re-synthesizes documentary voiceover narration using /Users/neilghosh/devtools/voice
+Re-synthesizes documentary voiceover narration using voices
 (F5-TTS MLX + 48kHz studio vocal exciter), mixes it with cached voice-suppressed
 GoPro ambient audio to match the exact frame durations of existing video segments,
 and remuxes with `-c:v copy` in seconds.
@@ -16,16 +16,16 @@ import argparse
 import subprocess
 import numpy as np
 
-VIDEO_DIR = '/Users/neilghosh/dev/video'
+VIDEO_DIR = '.'
 sys.path.insert(0, VIDEO_DIR)
 
 from voice_suppressor import extract_stereo_audio, suppress_voice_keep_ambient
 import map_telemetry_hud as mth
 import build_sample_doc as bsd
 
-DEVTOOLS_VOICE_PYTHON = '/Users/neilghosh/devtools/voice/.venv/bin/python'
-F5_BATCH_SCRIPT = '/Users/neilghosh/dev/skills/skills/expedition-documentary-creator/scripts/f5_batch_synth.py'
-WORK_DIR = '/Users/neilghosh/dev/video/work/segments_v4'
+DEVTOOLS_VOICE_PYTHON = 'python3'
+F5_BATCH_SCRIPT = './scripts/f5_batch_synth.py'
+WORK_DIR = './work/segments_v4'
 SR = 48000
 
 
@@ -211,7 +211,7 @@ def remux_for_voice(voice_preset, ref_audio, out_mp4, steps=8, q_bits=8, base_se
 
 def main():
     parser = argparse.ArgumentParser(description='Remux existing documentary video segments with new cloned voice audio')
-    parser.add_argument('--voice', required=True, help='Preset name: neil, tony, atherton, etc.')
+    parser.add_argument('--voice', required=True, help='Preset name: primary, tony, narrator_uk, etc.')
     parser.add_argument('--ref-audio', default=None, help='Optional reference WAV path override')
     parser.add_argument('--output', required=True, help='Output MP4 path')
     parser.add_argument('--steps', type=int, default=8, help='RK4 ODE steps (default: 8 = 32 NFEs)')

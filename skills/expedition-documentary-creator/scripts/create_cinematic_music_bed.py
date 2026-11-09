@@ -13,7 +13,7 @@ SR = 48000
 TARGET_DURATION = 1566.850  # Must match video length down to the millisecond
 TOTAL_SAMPLES = int(round(TARGET_DURATION * SR))  # 75,208,800 samples
 
-MUSIC_DIR = '/Users/neilghosh/dev/video/work/music'
+MUSIC_DIR = os.environ.get('MUSIC_DIR', 'work/music')
 TR_PATH = os.path.join(MUSIC_DIR, 'Tranquility_Base.mp3')
 AMB_PATH = os.path.join(MUSIC_DIR, 'Ambiment.mp3')
 OUT_NPY = os.path.join(MUSIC_DIR, 'expedition_music_bed_48k.npy')
@@ -41,7 +41,7 @@ data_amb = load_resample_stereo_48k(AMB_PATH)
 
 print(f"  Tranquility Base: {len(data_tr)/SR:.2f}s | Ambiment: {len(data_amb)/SR:.2f}s")
 
-# 2. Transition Point: At 810s (~13.5 min, entering Bandipur & Nilgiri foothills)
+# 2. Transition Point: At 810s (~13.5 min, entering Forest Reserve & Mountain foothills)
 # Crossfade duration: 20 seconds (800s to 820s)
 CROSSFADE_START = 800.0
 CROSSFADE_DUR = 20.0

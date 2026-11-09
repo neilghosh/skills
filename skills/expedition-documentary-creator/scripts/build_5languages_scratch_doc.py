@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""HYDERABAD -> KERALA EXPEDITION: 5-LANGUAGE BROADCAST DOCUMENTARY BUILDER
+"""STARTING CITY -> HIGHLANDS EXPEDITION: 5-LANGUAGE BROADCAST DOCUMENTARY BUILDER
 Zero-Clipping Group-Level Audio Mixing with Real Voice-Suppressed Surrounding Audio
 (Car, Water, Wind, Forest Ambience) + Subtle Cinematic Backing.
 
@@ -36,18 +36,18 @@ import numpy as np
 import soundfile as sf
 from scipy.signal import resample_poly
 
-VIDEO_DIR       = '/Users/neilghosh/dev/video'
-WORK_OUT        = '/Users/neilghosh/dev/video/work/equal_timeline_v2'
-AUDIO_TRACKS    = '/Users/neilghosh/dev/video/audio_tracks'
-FINAL_MP4       = '/Users/neilghosh/dev/video/expedition_all_videos_multiaudio.mp4'
-MUSIC_BED_NPY   = '/Users/neilghosh/dev/video/work/music/expedition_music_bed_48k.npy'
-EDGE_TTS_BIN    = '/Users/neilghosh/devtools/voice/.venv/bin/edge-tts'
-VOICE_DEV_DIR   = '/Users/neilghosh/devtools/voice'
-BATCH_SYNTH_BIN = '/Users/neilghosh/.gemini/config/skills/expedition-documentary-creator/scripts/f5_batch_synth.py'
+VIDEO_DIR       = '.'
+WORK_OUT        = './work/equal_timeline_v2'
+AUDIO_TRACKS    = './audio_tracks'
+FINAL_MP4       = './expedition_all_videos_multiaudio.mp4'
+MUSIC_BED_NPY   = './work/music/expedition_music_bed_48k.npy'
+EDGE_TTS_BIN    = 'edge-tts'
+VOICE_DEV_DIR   = 'voices'
+BATCH_SYNTH_BIN = './scripts/f5_batch_synth.py'
 
 SR = 48000
 
-ALL_AMB_DIRS = glob.glob('/Users/neilghosh/dev/video/work/*/ambient_cache')
+ALL_AMB_DIRS = glob.glob('./work/*/ambient_cache')
 
 # ─── 5-Voice Specifications ───────────────────────────────────────────────────
 VOICE_SPECS = [
@@ -336,7 +336,7 @@ def build_track(v_tag, voice, rate, lang, label, engine, timeline, segments, scr
 # ─── Main Execution Pipeline ──────────────────────────────────────────────────
 def main():
     print("=" * 70)
-    print("HYDERABAD -> KERALA EXPEDITION: 5-LANGUAGE BROADCAST BUILD")
+    print("STARTING CITY -> HIGHLANDS EXPEDITION: 5-LANGUAGE BROADCAST BUILD")
     print("Real Voice-Suppressed Surrounding Audio (Car, Water, Wind) + Subtle Score")
     print("=" * 70)
 

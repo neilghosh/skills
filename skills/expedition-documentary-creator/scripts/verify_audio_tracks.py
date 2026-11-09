@@ -1,15 +1,15 @@
 """
 Utility script to verify that each generated .m4a audio track is a valid MP4 container
-and contains audio data. This helps catch errors like the missing moov atom for
-track_shastri.m4a before the final mux step.
+and contains audio data before the final mux step.
 
 Usage:
-    python3 verify_audio_tracks.py
+    python3 verify_audio_tracks.py [audio_dir]
 """
+import sys
 import subprocess
 import pathlib
 
-AUDIO_DIR = pathlib.Path('/Users/neilghosh/dev/video/audio_tracks')
+AUDIO_DIR = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else pathlib.Path('audio_tracks')
 
 def is_valid_m4a(file_path: pathlib.Path) -> bool:
     """Return True if ffprobe can read the file and reports an audio stream."""

@@ -5,68 +5,68 @@ from io import BytesIO
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-TILE_CACHE_DIR = '/Users/neilghosh/dev/video/work/sat_tiles'
+TILE_CACHE_DIR = './work/sat_tiles'
 os.makedirs(TILE_CACHE_DIR, exist_ok=True)
 
 # Real towns, villages, forest checkposts, and highway markers across the route
 NEARBY_PLACES = [
-    # Mysuru - Ramanagara corridor
-    {'name': 'Ramanagara', 'lat': 12.7209, 'lon': 77.2799, 'kind': 'town'},
+    # Valley City - Granite Hills corridor
+    {'name': 'Granite Hills', 'lat': 12.7209, 'lon': 77.2799, 'kind': 'town'},
     {'name': 'Channapatna', 'lat': 12.6518, 'lon': 77.2067, 'kind': 'town'},
     {'name': 'Bidadi', 'lat': 12.7981, 'lon': 77.3866, 'kind': 'village'},
     {'name': 'Maddur', 'lat': 12.5842, 'lon': 77.0444, 'kind': 'town'},
     {'name': 'Mandya', 'lat': 12.5218, 'lon': 76.8951, 'kind': 'city'},
-    {'name': 'Mysuru (Mysore)', 'lat': 12.2958, 'lon': 76.6394, 'kind': 'city'},
+    {'name': 'Valley City (Valley City)', 'lat': 12.2958, 'lon': 76.6394, 'kind': 'city'},
     {'name': 'Nanjangud', 'lat': 12.1200, 'lon': 76.6801, 'kind': 'town'},
-    # Bandipur & Mudumalai & Nilgiris tri-junction
+    # Forest Reserve & Biosphere & Mountain Range tri-junction
     {'name': 'Gundlupet', 'lat': 11.8080, 'lon': 76.6914, 'kind': 'town'},
     {'name': 'Hangala', 'lat': 11.7165, 'lon': 76.6578, 'kind': 'village'},
-    {'name': 'Bandipur Checkpost', 'lat': 11.6656, 'lon': 76.6285, 'kind': 'village'},
+    {'name': 'Forest Reserve Checkpost', 'lat': 11.6656, 'lon': 76.6285, 'kind': 'village'},
     {'name': 'Moolehole (KA/KL Border)', 'lat': 11.6780, 'lon': 76.4730, 'kind': 'village'},
     {'name': 'Kakkanalla (KA/TN Border)', 'lat': 11.6085, 'lon': 76.5975, 'kind': 'village'},
     {'name': 'Theppakadu', 'lat': 11.5819, 'lon': 76.5858, 'kind': 'village'},
     {'name': 'Masinagudi', 'lat': 11.5732, 'lon': 76.6429, 'kind': 'town'},
     {'name': 'Gudalur (TN)', 'lat': 11.5030, 'lon': 76.4917, 'kind': 'town'},
     {'name': 'Ooty (Udhagamandalam)', 'lat': 11.4102, 'lon': 76.6950, 'kind': 'city'},
-    # Wayanad District (Kerala) towns & villages
+    # Mountain District District (Highlands) towns & villages
     {'name': 'Muthanga Wildlife Post', 'lat': 11.6725, 'lon': 76.3733, 'kind': 'village'},
-    {'name': 'Sultan Bathery', 'lat': 11.6644, 'lon': 76.2570, 'kind': 'town'},
+    {'name': 'Frontier Town', 'lat': 11.6644, 'lon': 76.2570, 'kind': 'town'},
     {'name': 'Meenangadi', 'lat': 11.6593, 'lon': 76.1714, 'kind': 'village'},
     {'name': 'Ambalavayal', 'lat': 11.6190, 'lon': 76.2122, 'kind': 'village'},
-    {'name': 'Kalpetta (Wayanad HQ)', 'lat': 11.6103, 'lon': 76.0827, 'kind': 'city'},
+    {'name': 'Plateau HQ (Mountain District HQ)', 'lat': 11.6103, 'lon': 76.0827, 'kind': 'city'},
     {'name': 'Kainatty', 'lat': 11.6305, 'lon': 76.0865, 'kind': 'village'},
     {'name': 'Muttil', 'lat': 11.6290, 'lon': 76.1130, 'kind': 'village'},
     {'name': 'Kaniyambetta', 'lat': 11.6895, 'lon': 76.0772, 'kind': 'village'},
-    {'name': 'Kambalakkad', 'lat': 11.6780, 'lon': 76.0400, 'kind': 'village'},
+    {'name': 'Valley Junction', 'lat': 11.6780, 'lon': 76.0400, 'kind': 'village'},
     {'name': 'Chundale', 'lat': 11.5762, 'lon': 76.0544, 'kind': 'village'},
-    {'name': 'Vythiri', 'lat': 11.5515, 'lon': 76.0402, 'kind': 'town'},
-    {'name': 'Lakkidi (Ghat Crest)', 'lat': 11.5194, 'lon': 76.0191, 'kind': 'village'},
+    {'name': 'Ghat Pass', 'lat': 11.5515, 'lon': 76.0402, 'kind': 'town'},
+    {'name': 'Crest View (Ghat Crest)', 'lat': 11.5194, 'lon': 76.0191, 'kind': 'village'},
     {'name': 'Pozhuthana', 'lat': 11.5865, 'lon': 75.9922, 'kind': 'village'},
-    {'name': 'Meppadi', 'lat': 11.5546, 'lon': 76.1353, 'kind': 'town'},
-    {'name': 'Kalladi', 'lat': 11.5152, 'lon': 76.1225, 'kind': 'village'},
-    {'name': 'Thollayiram Kandi', 'lat': 11.4948, 'lon': 76.1060, 'kind': 'village'},
+    {'name': 'Ridge Town', 'lat': 11.5546, 'lon': 76.1353, 'kind': 'town'},
+    {'name': 'Foothill', 'lat': 11.5152, 'lon': 76.1225, 'kind': 'village'},
+    {'name': 'Highland Peak', 'lat': 11.4948, 'lon': 76.1060, 'kind': 'village'},
     {'name': 'Chooralmala', 'lat': 11.4820, 'lon': 76.1460, 'kind': 'village'},
     {'name': 'Vaduvanchal', 'lat': 11.5390, 'lon': 76.2085, 'kind': 'village'},
 ]
 
 # Approximate State & District Boundary Polylines for clear visual cartography
 STATE_BORDERS = [
-    # Karnataka (Chamarajanagar) / Tamil Nadu (Nilgiris) border along Moyar River
+    # Highland State (Border District) / Southern State (Mountain Range) border along Moyar River
     [
         (11.645, 76.430), (11.625, 76.510), (11.608, 76.597),
         (11.602, 76.680), (11.595, 76.780), (11.580, 76.880)
     ],
-    # Kerala (Wayanad) / Karnataka (Chamarajanagar & Mysuru) border
+    # Highlands (Mountain District) / Highland State (Border District & Valley City) border
     [
         (11.880, 76.120), (11.790, 76.260), (11.710, 76.390),
         (11.645, 76.430)
     ],
-    # Kerala (Wayanad & Malappuram) / Tamil Nadu (Nilgiris) border
+    # Highlands (Mountain District & Foothill District) / Southern State (Mountain Range) border
     [
         (11.645, 76.430), (11.580, 76.380), (11.510, 76.310),
         (11.460, 76.210), (11.430, 76.120), (11.410, 76.040)
     ],
-    # Wayanad District / Kozhikode District border (along Thamarassery Ghat escarpment)
+    # Mountain District District / Coastal Dist District border (along Escarpment Ghat escarpment)
     [
         (11.650, 75.920), (11.570, 75.965), (11.515, 76.015),
         (11.470, 76.045), (11.430, 76.120)
@@ -75,107 +75,107 @@ STATE_BORDERS = [
 
 # State / District Area Watermark Labels
 REGION_WATERMARKS = [
-    {'text': 'KARNATAKA\n(MYSURU DIST.)', 'lat': 12.38, 'lon': 76.82},
-    {'text': 'KARNATAKA\n(CHAMARAJANAGAR DIST.)', 'lat': 11.74, 'lon': 76.62},
-    {'text': 'TAMIL NADU\n(THE NILGIRIS DIST.)', 'lat': 11.53, 'lon': 76.62},
-    {'text': 'KERALA\n(WAYANAD DISTRICT)', 'lat': 11.62, 'lon': 76.16},
-    {'text': 'KERALA\n(KOZHIKODE DIST.)', 'lat': 11.49, 'lon': 75.95},
+    {'text': 'HIGHLAND STATE\n(VALLEY CITY DIST.)', 'lat': 12.38, 'lon': 76.82},
+    {'text': 'HIGHLAND STATE\n(CHAMARAJANAGAR DIST.)', 'lat': 11.74, 'lon': 76.62},
+    {'text': 'SOUTHERN STATE\n(THE MOUNTAINS DIST.)', 'lat': 11.53, 'lon': 76.62},
+    {'text': 'HIGHLANDS\n(MOUNTAIN DISTRICT DISTRICT)', 'lat': 11.62, 'lon': 76.16},
+    {'text': 'HIGHLANDS\n(COASTAL DIST DIST.)', 'lat': 11.49, 'lon': 75.95},
 ]
 
 SHOT_TELEMETRY = [
     {
         'id': 0,
-        'title': 'NH-275 MYSURU CORRIDOR',
-        'subtitle': 'RAMANAGARA DIST., KARNATAKA  •  NH-275',
-        'state_dist': 'KARNATAKA • RAMANAGARA DIST.',
+        'title': 'NH-275 VALLEY CITY CORRIDOR',
+        'subtitle': 'RAMANAGARA DIST., HIGHLAND STATE  •  NH-275',
+        'state_dist': 'HIGHLAND STATE • RAMANAGARA DIST.',
         'lat': 12.8012, 'lon': 77.3824,
         'alt_m': 735, 'spd_kmh': 68, 'dist_km': 45,
         'zoom': 11,
         'edge_arrows': [
-            ('top-right', 'NE', 'BENGALURU (42 KM)'),
-            ('bottom-left', 'SW', 'MYSURU (95 KM) / KERALA'),
+            ('top-right', 'NE', 'METRO HUB (42 KM)'),
+            ('bottom-left', 'SW', 'VALLEY CITY (95 KM) / HIGHLANDS'),
         ],
     },
     {
         'id': 1,
-        'title': 'BANDIPUR TIGER RESERVE',
-        'subtitle': 'CHAMARAJANAGAR DIST., KARNATAKA  •  NH-181',
-        'state_dist': 'KARNATAKA • CHAMARAJANAGAR DIST.',
+        'title': 'FOREST RESERVE TIGER RESERVE',
+        'subtitle': 'CHAMARAJANAGAR DIST., HIGHLAND STATE  •  NH-181',
+        'state_dist': 'HIGHLAND STATE • CHAMARAJANAGAR DIST.',
         'lat': 11.6524, 'lon': 76.6281,
         'alt_m': 910, 'spd_kmh': 28, 'dist_km': 215,
         'zoom': 11,
         'edge_arrows': [
-            ('top', 'N', 'GUNDLUPET & MYSURU (KA)'),
+            ('top', 'N', 'GUNDLUPET & VALLEY CITY (KA)'),
             ('bottom', 'S', 'TN BORDER (5 KM) & OOTY'),
-            ('left', 'W', 'WAYANAD (KERALA)'),
+            ('left', 'W', 'MOUNTAIN DISTRICT (HIGHLANDS)'),
         ],
     },
     {
         'id': 2,
-        'title': 'MUDUMALAI BIOSPHERE',
-        'subtitle': 'THE NILGIRIS DIST., TAMIL NADU  •  3-STATE BORDER',
-        'state_dist': 'TAMIL NADU • THE NILGIRIS DIST.',
+        'title': 'BIOSPHERE BIOSPHERE',
+        'subtitle': 'THE MOUNTAINS DIST., SOUTHERN STATE  •  3-STATE BORDER',
+        'state_dist': 'SOUTHERN STATE • THE MOUNTAINS DIST.',
         'lat': 11.5712, 'lon': 76.5942,
         'alt_m': 880, 'spd_kmh': 18, 'dist_km': 232,
         'zoom': 11,
         'edge_arrows': [
-            ('top', 'N', 'BANDIPUR (KARNATAKA)'),
+            ('top', 'N', 'FOREST RESERVE (HIGHLAND STATE)'),
             ('right', 'E', 'MASINAGUDI & OOTY (TN)'),
-            ('left', 'W', 'SULTAN BATHERY (KERALA)'),
+            ('left', 'W', 'FRONTIER TOWN (HIGHLANDS)'),
         ],
     },
     {
         'id': 3,
-        'title': 'WAYANAD INTERIOR ESTATES',
-        'subtitle': 'WAYANAD DIST., KERALA  •  NEAR CHUNDALE & VYTHIRI',
-        'state_dist': 'KERALA • WAYANAD DISTRICT',
+        'title': 'MOUNTAIN DISTRICT INTERIOR ESTATES',
+        'subtitle': 'MOUNTAIN DISTRICT DIST., HIGHLANDS  •  NEAR CHUNDALE & GHAT PASS',
+        'state_dist': 'HIGHLANDS • MOUNTAIN DISTRICT DISTRICT',
         'lat': 11.5815, 'lon': 76.0241,
         'alt_m': 780, 'spd_kmh': 22, 'dist_km': 305,
         'zoom': 12,
         'edge_arrows': [
-            ('top-right', 'NE', 'KALPETTA TOWN (8 KM)'),
-            ('bottom', 'S', 'VYTHIRI (3 KM) & MEPPADI'),
-            ('left', 'W', 'KOZHIKODE DIST. BORDER'),
+            ('top-right', 'NE', 'PLATEAU HQ TOWN (8 KM)'),
+            ('bottom', 'S', 'GHAT PASS (3 KM) & RIDGE TOWN'),
+            ('left', 'W', 'COASTAL DIST DIST. BORDER'),
         ],
     },
     {
         'id': 4,
-        'title': 'VYTHIRI RAINFOREST HILLS',
-        'subtitle': 'WAYANAD DIST., KERALA  •  ABOVE THAMARASSERY GHAT',
-        'state_dist': 'KERALA • WAYANAD DISTRICT',
+        'title': 'GHAT PASS RAINFOREST HILLS',
+        'subtitle': 'MOUNTAIN DISTRICT DIST., HIGHLANDS  •  ABOVE ESCARPMENT GHAT',
+        'state_dist': 'HIGHLANDS • MOUNTAIN DISTRICT DISTRICT',
         'lat': 11.5515, 'lon': 76.0402,
         'alt_m': 776, 'spd_kmh': 32, 'dist_km': 318,
         'zoom': 12,
         'edge_arrows': [
-            ('top', 'N', 'KALPETTA HQ (11 KM)'),
-            ('bottom-left', 'SW', 'LAKKIDI & KOZHIKODE (NH-766)'),
-            ('right', 'E', 'MEPPADI TEA ESTATES (10 KM)'),
+            ('top', 'N', 'PLATEAU HQ HQ (11 KM)'),
+            ('bottom-left', 'SW', 'CREST VIEW & COASTAL DIST (NH-766)'),
+            ('right', 'E', 'RIDGE TOWN TEA ESTATES (10 KM)'),
         ],
     },
     {
         'id': 5,
-        'title': 'MEPPADI TEA GARDENS',
-        'subtitle': 'WAYANAD DIST., KERALA  •  MEPPADI – OOTY ROAD',
-        'state_dist': 'KERALA • WAYANAD DISTRICT',
+        'title': 'RIDGE TOWN TEA GARDENS',
+        'subtitle': 'MOUNTAIN DISTRICT DIST., HIGHLANDS  •  RIDGE TOWN – OOTY ROAD',
+        'state_dist': 'HIGHLANDS • MOUNTAIN DISTRICT DISTRICT',
         'lat': 11.5350, 'lon': 76.1250,
         'alt_m': 940, 'spd_kmh': 0, 'dist_km': 334,
         'zoom': 12,
         'edge_arrows': [
-            ('top-left', 'NW', 'KALPETTA (12 KM)'),
-            ('bottom', 'S', 'KALLADI & 900 KANDI (5 KM)'),
-            ('right', 'E', 'VADUVANCHAL & GUDALUR (TN)'),
+            ('top-left', 'NW', 'PLATEAU HQ (12 KM)'),
+            ('bottom', 'S', 'KALLADI & HIGHLAND PEAK (5 KM)'),
+            ('right', 'E', 'EASTERN RIDGE & GUDALUR (TN)'),
         ],
     },
     {
         'id': 6,
-        'title': '900 KANDI (THOLLAYIRAM)',
-        'subtitle': 'WAYANAD DIST., KERALA  •  ABOVE KALLADI & MEPPADI',
-        'state_dist': 'KERALA • WAYANAD DISTRICT',
+        'title': 'HIGHLAND PEAK (THOLLAYIRAM)',
+        'subtitle': 'MOUNTAIN DISTRICT DIST., HIGHLANDS  •  ABOVE KALLADI & RIDGE TOWN',
+        'state_dist': 'HIGHLANDS • MOUNTAIN DISTRICT DISTRICT',
         'lat': 11.4948, 'lon': 76.1060,
         'alt_m': 1455, 'spd_kmh': 14, 'dist_km': 344,
         'zoom': 12,
         'edge_arrows': [
-            ('top', 'N', 'KALLADI & MEPPADI (6 KM)'),
+            ('top', 'N', 'KALLADI & RIDGE TOWN (6 KM)'),
             ('bottom', 'S', 'MALAPPURAM DIST. / NILAMBUR'),
             ('right', 'E', 'CHOORALMALA (4 KM)'),
         ],
@@ -183,29 +183,29 @@ SHOT_TELEMETRY = [
     {
         'id': 7,
         'title': 'WESTERN GHATS ESCARPMENT',
-        'subtitle': 'WAYANAD – MALAPPURAM BORDER  •  1,458m RIDGE',
-        'state_dist': 'KERALA • WAYANAD / MALAPPURAM BORDER',
+        'subtitle': 'MOUNTAIN DISTRICT – MALAPPURAM BORDER  •  1,458m RIDGE',
+        'state_dist': 'HIGHLANDS • MOUNTAIN DISTRICT / MALAPPURAM BORDER',
         'lat': 11.4948, 'lon': 76.1060,
         'alt_m': 1458, 'spd_kmh': 0, 'dist_km': 345,
         'zoom': 12,
         'edge_arrows': [
-            ('top', 'N', 'MEPPADI & KALPETTA'),
-            ('bottom-left', 'SW', 'KOZHIKODE & ARABIAN SEA'),
-            ('right', 'E', 'TAMIL NADU (NILGIRIS)'),
+            ('top', 'N', 'RIDGE TOWN & PLATEAU HQ'),
+            ('bottom-left', 'SW', 'COASTAL DIST & ARABIAN SEA'),
+            ('right', 'E', 'SOUTHERN STATE (MOUNTAINS)'),
         ],
     },
     {
         'id': 8,
-        'title': 'KALPETTA HIGHLANDS',
-        'subtitle': 'WAYANAD DIST., KERALA  •  KAMBALAKKAD – KALPETTA',
-        'state_dist': 'KERALA • WAYANAD DISTRICT',
+        'title': 'PLATEAU HQ HIGHLANDS',
+        'subtitle': 'MOUNTAIN DISTRICT DIST., HIGHLANDS  •  VALLEY JUNCTION – PLATEAU HQ',
+        'state_dist': 'HIGHLANDS • MOUNTAIN DISTRICT DISTRICT',
         'lat': 11.6650, 'lon': 76.0650,
         'alt_m': 865, 'spd_kmh': 24, 'dist_km': 368,
         'zoom': 12,
         'edge_arrows': [
-            ('bottom', 'S', 'KALPETTA TOWN (6 KM)'),
-            ('top', 'N', 'MANANTHAVADY & KANNUR'),
-            ('right', 'E', 'SULTAN BATHERY & MYSURU'),
+            ('bottom', 'S', 'PLATEAU HQ TOWN (6 KM)'),
+            ('top', 'N', 'NORTHERN CORRIDOR & KANNUR'),
+            ('right', 'E', 'FRONTIER TOWN & VALLEY CITY'),
         ],
     },
 ]
@@ -215,46 +215,46 @@ CHAPTERS = [
         'before_shot': 0,
         'chapter_num': 'CHAPTER I',
         'title': 'THE ROYAL MYSORE & TIGER CORRIDOR',
-        'subtitle': 'Karnataka (Ramanagara & Mysuru)   >>   Bandipur Tiger Reserve   >>   Tamil Nadu (Mudumalai)',
+        'subtitle': 'Highland State (Granite Hills & Valley City)   >>   Forest Reserve Tiger Reserve   >>   Southern State (Biosphere)',
         'wp_indices': [0, 1, 2],
         'center_lat': 12.15, 'center_lon': 76.85, 'zoom': 9,
-        'stats': 'STATES: KARNATAKA -> TAMIL NADU    |    DISTANCE: 232 KM    |    ELEVATION: 735m TO 910m',
-        'narration': 'Chapter One. From the plains of Mysore into the Bandipur and Mudumalai tiger corridor.',
+        'stats': 'STATES: HIGHLAND STATE -> SOUTHERN STATE    |    DISTANCE: 232 KM    |    ELEVATION: 735m TO 910m',
+        'narration': 'Chapter One. From the plains of Valley City into the Forest Reserve and Biosphere tiger corridor.',
         'dir_banners': [
-            ('top-right', 'NE >> BENGALURU (NH-275)'),
-            ('left', '<< KERALA (WAYANAD & KANNUR)'),
-            ('bottom-right', 'SE >> OOTY & COIMBATORE (TAMIL NADU)'),
+            ('top-right', 'NE >> METRO HUB (NH-275)'),
+            ('left', '<< HIGHLANDS (MOUNTAIN DISTRICT & KANNUR)'),
+            ('bottom-right', 'SE >> OOTY & COIMBATORE (SOUTHERN STATE)'),
         ],
     },
     {
         'before_shot': 3,
         'chapter_num': 'CHAPTER II',
-        'title': 'CROSSING INTO WAYANAD DISTRICT, KERALA',
-        'subtitle': '3-State Border (KA / TN / KL)   >>   Sultan Bathery   >>   Kalpetta, Vythiri & Meppadi',
+        'title': 'CROSSING INTO MOUNTAIN DISTRICT DISTRICT, HIGHLANDS',
+        'subtitle': '3-State Border (KA / TN / KL)   >>   Frontier Town   >>   Plateau HQ, Ghat Pass & Ridge Town',
         'wp_indices': [2, 4, 5],
         'center_lat': 11.58, 'center_lon': 76.28, 'zoom': 11,
-        'stats': 'BORDER: NILGIRIS (TN) -> WAYANAD (KL)    |    DISTANCE: 102 KM    |    ELEVATION: 776m TO 940m',
-        'narration': 'Chapter Two. Crossing the Kerala border into the rainforest hills and colonial tea estates of Wayanad.',
+        'stats': 'BORDER: MOUNTAINS (TN) -> MOUNTAIN DISTRICT (KL)    |    DISTANCE: 102 KM    |    ELEVATION: 776m TO 940m',
+        'narration': 'Chapter Two. Crossing the Highlands border into the rainforest hills and colonial tea estates of Mountain District.',
         'dir_banners': [
-            ('top', 'N >> KARNATAKA (MYSURU & BANDIPUR)'),
-            ('bottom-right', 'E >> TAMIL NADU (MASINAGUDI & OOTY)'),
-            ('bottom-left', 'SW >> KOZHIKODE & MALABAR COAST (NH-766)'),
+            ('top', 'N >> HIGHLAND STATE (VALLEY CITY & FOREST RESERVE)'),
+            ('bottom-right', 'E >> SOUTHERN STATE (MASINAGUDI & OOTY)'),
+            ('bottom-left', 'SW >> COASTAL DIST & MALABAR COAST (NH-766)'),
         ],
     },
     {
         'before_shot': 6,
         'chapter_num': 'CHAPTER III',
-        'title': 'ASCENT TO 900 KANDI & KALPETTA',
-        'subtitle': 'Meppadi & Kalladi Village   >>   1,458m Thollayiram Kandi Ridge   >>   Kalpetta HQ',
+        'title': 'ASCENT TO HIGHLAND PEAK & PLATEAU HQ',
+        'subtitle': 'Ridge Town & Foothill Village   >>   1,458m Highland Peak Ridge   >>   Plateau HQ HQ',
         'wp_indices': [5, 6, 8],
         'center_lat': 11.58, 'center_lon': 76.08, 'zoom': 12,
-        'stats': 'DISTRICT: WAYANAD, KERALA    |    SUMMIT ALTITUDE: 1,458m    |    TOTAL ROUTE: 368 KM',
+        'stats': 'DISTRICT: MOUNTAIN DISTRICT, HIGHLANDS    |    SUMMIT ALTITUDE: 1,458m    |    TOTAL ROUTE: 368 KM',
         'narration': 'Chapter Three. Ascending fourteen hundred and fifty meters to the summit ridges of Nine Hundred Kandi.',
         'dir_banners': [
-            ('top', 'N >> MANANTHAVADY & KARNATAKA'),
+            ('top', 'N >> NORTHERN CORRIDOR & HIGHLAND STATE'),
             ('bottom', 'S >> MALAPPURAM DIST. (NILAMBUR VALLEY)'),
-            ('left', 'W >> VYTHIRI, LAKKIDI & KOZHIKODE'),
-            ('right', 'E >> SULTAN BATHERY & TAMIL NADU'),
+            ('left', 'W >> GHAT PASS, CREST VIEW & COASTAL DIST'),
+            ('right', 'E >> FRONTIER TOWN & SOUTHERN STATE'),
         ],
     },
 ]
@@ -735,7 +735,7 @@ def render_chapter_map_video(chap_dict, out_mp4_path, wav_path, duration=3.4, fp
     f_stats = load_font(18, bold=True)
     f_dir = load_font(15, bold=True)
 
-    bg_draw.text((70, 20), f"KERALA & WESTERN GHATS EXPEDITION   •   {chap_dict['chapter_num']}", fill=(245, 185, 55, 255), font=f_chap)
+    bg_draw.text((70, 20), f"HIGHLANDS & WESTERN GHATS EXPEDITION   •   {chap_dict['chapter_num']}", fill=(245, 185, 55, 255), font=f_chap)
     bg_draw.text((70, 48), chap_dict['title'], fill=(255, 255, 255, 255), font=f_title)
     bg_draw.text((70, 95), chap_dict['subtitle'], fill=(180, 210, 230, 240), font=f_sub)
     bg_draw.text((70, H - 70), chap_dict['stats'], fill=(245, 205, 85, 255), font=f_stats)

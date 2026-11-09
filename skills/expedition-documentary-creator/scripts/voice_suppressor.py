@@ -168,14 +168,19 @@ def suppress_voice_keep_ambient(stereo_audio, sr=48000):
 
 
 if __name__ == '__main__':
-    gopro_dir = '/Users/neilghosh/Pictures/Kerala 2026/GoPro'
-    out_dir = '/Users/neilghosh/dev/video/work'
-    os.makedirs(out_dir, exist_ok=True)
-    for name in ['GX011476.MP4', 'GX011503.MP4', 'GX011512.MP4', 'GX011576.MP4', 'GX011587.MP4']:
-        path = os.path.join(gopro_dir, name)
+    import argparse
+    parser = argparse.ArgumentParser(description="Suppress passenger speech while keeping surrounding ambient audio.")
+    parser.add_argument('--video-dir', required=True, help='Input video directory')
+    parser.add_argument('--out-dir', default='work', help='Output directory')
+    args = parser.parse_args()
+    os.makedirs(args.out_dir, exist_ok=True)
+    for name in sorted(os.listdir(args.video_dir)):
+        if not name.lower().endswith(('.mp4', '.mov')):
+            continue
+        path = os.path.join(args.video_dir, name)
         audio = extract_stereo_audio(path, sr=48000, start=0, duration=12)
         clean = suppress_voice_keep_ambient(audio, sr=48000)
-        out_mp3 = os.path.join(out_dir, f"{name[:8].lower()}_clean.mp3")
+        out_mp3 = os.path.join(args.out_dir, f"{os.path.splitext(name)[0].lower()}_clean.mp3")
         p = subprocess.Popen(
             ['ffmpeg', '-y', '-v', 'error', '-f', 'f32le', '-ar', '48000', '-ac', '2', '-i', '-',
              '-acodec', 'libmp3lame', '-q:a', '3', out_mp3],
